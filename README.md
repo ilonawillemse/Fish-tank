@@ -1,6 +1,6 @@
 # project-ilonawillemse
 
-![Fish visualisation](doc/prototype.png)
+![Fish visualisation](doc/image/prototype.png)
 
 ## How to run
 
@@ -17,7 +17,7 @@ To test the implementation simply run `pytest` in the root folder of the project
 pytest
 ```
 
-## general idea
+## General idea
 
 ```
 Fish swim in a aquarium.
