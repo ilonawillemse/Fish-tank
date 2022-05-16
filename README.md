@@ -39,7 +39,7 @@ $ python3 fish.py
     - [] adding slides in which the user can change certain values.
 
 - end goal
-    - [] visualise how fish populations are influences
+    - [] visualise how fish populations are influenced
 
 
 ## libraries
