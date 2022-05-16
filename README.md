@@ -2,6 +2,9 @@
 This code creates a situation that visualises a fishtank within an animation.
 
 ![Fish visualisation](doc/image/prototype.png)
+```
+The fish move like boids. The way the fish move influence other fish. or the fish will move randomly through the tank
+```
 
 ## How to run
 
@@ -13,7 +16,6 @@ $ python3 fish.py
 
 - Fish
     - [] swim in a fishtank.
-    - [] swim by boids model
     - [] through swimming energy level goes down
     - [] energy can be obtained by eating algea.
     - [] with energy fish can mate and bare children.
@@ -32,6 +34,7 @@ $ python3 fish.py
 - [] the less algea the less food for the fish, so no mating.
 
 - optional
+    - [] swim by boids model
     - [] different male and female fish for mating.
     - [] different species of fish
     - [] fish grow when they eat.
@@ -39,8 +42,7 @@ $ python3 fish.py
     - [] adding slides in which the user can change certain values.
 
 - end goal
-    - [] visualise how fish populations are influenced
-
+    - [] visualise how fish populations are influenced by light strength
 
 ## libraries
 ```
@@ -51,6 +53,7 @@ $ python3 fish.py
 - matplotlib
 - copy to copy some grids
 - pandas to transform some data for visualisation
+- mesa ??
 ```
 
 ## limitations that could come up
@@ -58,4 +61,15 @@ $ python3 fish.py
 - not being able to let the fish grow
 - adding the slides can be tough
 - boid model implementation
+- because i cannot use plt.show() it will be hard to 
+- visualize the animation if i let it run forever
 
+## inspiration
+```
+https://docplayer.nl/161846295-Agent-based-modeling-domein-r-computational-science.html
+
+also moving like boids was an inspiration bron
+
+I'd like to implement 2 different fish species if possible
+also i might add a male vs female componend
+```
