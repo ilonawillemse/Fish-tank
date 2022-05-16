@@ -54,8 +54,8 @@ $ python3 fish.py
 ```
 
 ## limitations that could come up
-not being able to insert an image inside the animation instead of a square
-not being able to let the fish grow
-adding the slides can be tough
-boid model implementation
+- not being able to insert an image inside the animation instead of a square
+- not being able to let the fish grow
+- adding the slides can be tough
+- boid model implementation
 
