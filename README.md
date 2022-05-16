@@ -1,5 +1,5 @@
 # project-ilona willemse fishtank
-![GitHub Dark](https://github.com/github-light.png#gh-dark-mode-only)
+This code creates a situation that visualises a fishtank within an animation.
 
 ![Fish visualisation](doc/image/prototype.png)
 
@@ -20,32 +20,39 @@ pytest
 
 # General idea
 
-Fish swim in a fishtank.
-because of the swimming, the fish will get tired.
-energy can be obtained by eating algea.
-with energy fish can mate and bare children.
+- Fish
+    - [] swim in a fishtank.
+    - [] will get tired through swimming.
+    - [] energy can be obtained by eating algea.
+    - [] with energy fish can mate and bare children.
 
-algea can grow with light strength.
-algea get reduced by fish that eat algea.
+- algea
+    - [] can grow with light strength.
+    - [] number gets reduced by fish that eat algea.
 
-the more fish, the less light, the less algea.
+- input
+    - [] light strenght
+    - [] starting algea density
+    - [] starting fish density
 
-the less algea the less food for the fish, so no mating.
+- [] the more fish, the less light, the less algea.
+- [] the less algea the less food for the fish, so no mating.
 
-I might implement different male and female fish for the mating.
-
-If possible I would like the fish to grow when they eat.
+- optional
+    - [] different male and female fish for mating.
+    - [] fish grow when they eat.
+    - [] different kinds of fish that only mate with the same species.
 
 
 ## libraries
 ```
-numpy
-matplotlib.pyplot to plot the data in an image
-matplotlib.animation to visualize the animation
-random to generate a random number to implement some chances
-matplotlib
-copy to copy some grids
-pandas to transform some data for visualisation
+- numpy
+- matplotlib.pyplot to plot the data in an image
+- matplotlib.animation to visualize the animation
+- random to generate a random number to implement some chances
+- matplotlib
+- copy to copy some grids
+- pandas to transform some data for visualisation
 ```
 
 ## limitations that could come up
