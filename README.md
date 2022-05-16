@@ -30,6 +30,25 @@ algea get reduced by fish that eat algea.
 
 the more fish, the less light, the less algea.
 
-the l
+the less algea the less food for the fish, so no mating.
+
+I might implement different male and female fish for the mating.
+
+If possible I would like the fish to grow when they eat.
+
 ```
+
+## libraries
+numpy
+matplotlib.pyplot to plot the data in an image
+matplotlib.animation to visualize the animation
+random to generate a random number to implement some chances
+matplotlib
+copy to copy some grids
+pandas to transform some data for visualisation
+
+# limitations that could come up
+not being able to insert an image inside the animation instead of a square
+not being able to let the fish grow
+
 
