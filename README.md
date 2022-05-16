@@ -1,4 +1,5 @@
-# project-ilonawillemse
+# project-ilona willemse fishtank
+![GitHub Dark](https://github.com/github-light.png#gh-dark-mode-only)
 
 ![Fish visualisation](doc/image/prototype.png)
 
@@ -17,10 +18,9 @@ To test the implementation simply run `pytest` in the root folder of the project
 pytest
 ```
 
-## General idea
+# General idea
 
-```
-Fish swim in a aquarium.
+Fish swim in a fishtank.
 because of the swimming, the fish will get tired.
 energy can be obtained by eating algea.
 with energy fish can mate and bare children.
@@ -36,9 +36,9 @@ I might implement different male and female fish for the mating.
 
 If possible I would like the fish to grow when they eat.
 
-```
 
 ## libraries
+```
 numpy
 matplotlib.pyplot to plot the data in an image
 matplotlib.animation to visualize the animation
@@ -46,8 +46,9 @@ random to generate a random number to implement some chances
 matplotlib
 copy to copy some grids
 pandas to transform some data for visualisation
+```
 
-# limitations that could come up
+## limitations that could come up
 not being able to insert an image inside the animation instead of a square
 not being able to let the fish grow
 
