@@ -9,39 +9,37 @@ This code creates a situation that visualises a fishtank within an animation.
 $ python3 fish.py
 ```
 
-
-## Testing (not sure yet if i'm going to implement this because of time)
-
-To test the implementation simply run `pytest` in the root folder of the project.
-
-```
-pytest
-```
-
 # General idea
 
 - Fish
     - [] swim in a fishtank.
-    - [] will get tired through swimming.
+    - [] swim by boids model
+    - [] through swimming energy level goes down
     - [] energy can be obtained by eating algea.
     - [] with energy fish can mate and bare children.
+    - [] fish die after a certain time stamp
 
 - algea
-    - [] can grow with light strength.
+    - [] can grow with light.
     - [] number gets reduced by fish that eat algea.
 
 - input
     - [] light strenght
     - [] starting algea density
-    - [] starting fish density
+    - [] starting number of fish
 
 - [] the more fish, the less light, the less algea.
 - [] the less algea the less food for the fish, so no mating.
 
 - optional
     - [] different male and female fish for mating.
+    - [] different species of fish
     - [] fish grow when they eat.
     - [] different kinds of fish that only mate with the same species.
+    - [] adding slides in which the user can change certain values.
+
+- end goal
+    - [] visualise how fish populations are influences
 
 
 ## libraries
@@ -58,5 +56,6 @@ pytest
 ## limitations that could come up
 not being able to insert an image inside the animation instead of a square
 not being able to let the fish grow
-
+adding the slides can be tough
+boid model implementation
 
