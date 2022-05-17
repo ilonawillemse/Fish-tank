@@ -49,8 +49,8 @@ class Fishtank():
         for _ in range(self.number_fish):
             randx = np.random.randint(0, self.x)
             randy = np.random.randint(0, self.y)
-            for i in range(self.x):
-                for j in range(self.y):
+            for i in range(self.y):
+                for j in range(self.x):
                         if i == randy and j == randx:
                             self.visgrid[i][j] = 2
 
@@ -60,59 +60,53 @@ class Fishtank():
     def status(self, x): 
         "this returns the visgrid after adjusting the next situation"   
         # print(self.visgrid) 
-
+        fish_mating = 0
+        energy = 0
         for i in range(self.y):
             for j in range(self.x):
+                "when the current pixel is a fish"   
                 if self.visgrid[i][j] == 2:
-                    number = np.random.randint(0,10)
-                    for a, b in self.surrounding:
-                        if i+a < self.x and i+a > 0 and j+b > 0 and j+b < self.y:
-                            if number < 1:
-                                self.tmp_visgrid[i][j+1] = 2
-                                self.tmp_visgrid[i][j] = 0
-                            elif number < 2:
-                                self.tmp_visgrid[i][j-1] = 2
-                                self.tmp_visgrid[i][j] = 0
-                            elif number < 3:
-                                self.tmp_visgrid[i+1][j+1] = 2
-                                self.tmp_visgrid[i][j] = 0
-                            elif number < 4:
-                                self.tmp_visgrid[i-1][j+1] = 2
-                                self.tmp_visgrid[i][j] = 0
-                            elif number < 5:
-                                self.tmp_visgrid[i+1][j] = 2
-                                self.tmp_visgrid[i][j] = 0
-                            elif number < 6:
-                                self.tmp_visgrid[i-1][j-1] = 2
-                                self.tmp_visgrid[i][j] = 0
-                            elif number < 7:
-                                self.tmp_visgrid[i+1][j-1] = 2
-                                self.tmp_visgrid[i][j] = 0
-                            else:
-                                self.tmp_visgrid[i-1][j] = 2
-                                self.tmp_visgrid[i][j] = 0
-
-                    # for a, b in self.surrounding:
-                    #     if i+a < self.x and i+a > 0 and j+b > 0 and j+b < self.y:
-                    #         if self.visgrid[i+a][j+b] == 2:
-                    #             self.visgrid[i][j] = np.random.choice([1,2], p = [0.4, 0.6])
-                
+                    surrounding = ((-1,-1),(-1,0),(0,-1),(1,0),(0,1),(1,1),(-1,1),(1,-1))
+                    random = np.random.choice([0,1,-1])
+                    random2 = np.random.choice([0,1,-1])
+                    
+                    for a, b in surrounding:
+                        if i+a <= self.x and i+a >= 0 and j+b >= 0 and j+b <= self.y:
+                            if self.visgrid[i+a][j+b] == 1:
+                                random = b
+                                random2 = a
+                                energy += 1
+                            # elif self.visgrid[i+a][j+b] == 2:
+                            #     random = a
+                            #     random2 = b
+                            #     fish_mating += 1
+                    # print(energy)
+                    # print(fish_mating)
+                    print(random)
+                    print(random2)
+                    if i+random < self.y and i+random >= 0 and j+random >= 0 and j+random < self.x and i+random2 < self.y and i+random2 >= 0 and j+random2 >= 0 and j+random2 < self.x:
+                        if random == 0 and random2 == 0:
+                            self.tmp_visgrid[i][j] = 2
+                        else:
+                            self.tmp_visgrid[i+random][j+random2] = 2
+                            self.tmp_visgrid[i][j] = 0    
+                            
         self.visgrid = deepcopy(self.tmp_visgrid)
         return self.tmp_visgrid
         
 
 if __name__ == "__main__":
-    probability_algea = 0.2
+    probability_algea = 0.4
     # probability_algea = float(input('probability of algea: '))
     # y = int(input('fishtank height: '))
     # x = int(input('fishtank width: '))
-    y = 50
-    x = 100
+    y = 20
+    x = 40
     # number_fish = int(input('number of fish inside the tank: '))
-    number_fish = 20
+    number_fish = 10
 
     # create a forest object
-    tank = Fishtank(50, 100, probability_algea, number_fish)
+    tank = Fishtank(y, x, probability_algea, number_fish)
 
     # creating the animation
     fig, ax = plt.subplots()
@@ -124,7 +118,7 @@ if __name__ == "__main__":
     im = ax.imshow(data, cmap=cmap)
     ims.append([im])
 
-    for _ in range(30):
+    for _ in range(70):
         data = tank.status(data)
         
         im = ax.imshow(data, cmap=cmap)
