@@ -53,7 +53,7 @@ class Fishtank():
                 for j in range(self.x):
                         if i == randy and j == randx:
                             self.visgrid[i][j] = 2
-
+        self.visgrid[0][0] = 3
         self.tmp_visgrid = deepcopy(self.visgrid)
         return self.visgrid
 
@@ -70,23 +70,27 @@ class Fishtank():
                     random = np.random.choice([0,1,-1])
                     random2 = np.random.choice([0,1,-1])
                     
-                    for a, b in surrounding:
-                        if i+a <= self.x and i+a >= 0 and j+b >= 0 and j+b <= self.y:
-                            if self.visgrid[i+a][j+b] == 1:
-                                random = b
-                                random2 = a
-                                energy += 1
-                            # elif self.visgrid[i+a][j+b] == 2:
-                            #     random = a
-                            #     random2 = b
-                            #     fish_mating += 1
+                    # for a, b in surrounding:
+                    #     if i+a <= self.x and i+a >= 0 and j+b >= 0 and j+b <= self.y:
+                    #         if self.visgrid[i+a][j+b] == 1:
+                    #             random = b
+                    #             random2 = a
+                    #             energy += 1
+                    #         # elif self.visgrid[i+a][j+b] == 2:
+                    #         #     random = a
+                    #         #     random2 = b
+                    #         #     fish_mating += 1
                     # print(energy)
-                    # print(fish_mating)
-                    print(random)
-                    print(random2)
+                    # # print(fish_mating)
+                    # # print(random)
+                    # # print(random2)
+                    # if energy > 3:
+                    #     self.tmp_visgrid[i][j] = 3
+
                     if i+random < self.y and i+random >= 0 and j+random >= 0 and j+random < self.x and i+random2 < self.y and i+random2 >= 0 and j+random2 >= 0 and j+random2 < self.x:
                         if random == 0 and random2 == 0:
                             self.tmp_visgrid[i][j] = 2
+                        
                         else:
                             self.tmp_visgrid[i+random][j+random2] = 2
                             self.tmp_visgrid[i][j] = 0    
@@ -96,7 +100,7 @@ class Fishtank():
         
 
 if __name__ == "__main__":
-    probability_algea = 0.4
+    probability_algea = 0.8
     # probability_algea = float(input('probability of algea: '))
     # y = int(input('fishtank height: '))
     # x = int(input('fishtank width: '))
@@ -110,7 +114,7 @@ if __name__ == "__main__":
 
     # creating the animation
     fig, ax = plt.subplots()
-    cmap = colors.ListedColormap(['blue', 'green', 'orange'])
+    cmap = colors.ListedColormap(['blue', 'green', 'orange', 'yellow'])
    
     ims = []
 
