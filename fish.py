@@ -27,18 +27,8 @@ class Fish(Agent):
             self.pos, moore=True, include_center=True
         )
         for i in range(len(possible_steps)):
-            # print(i)
-            # print(possible_steps)
-            # print(len(possible_steps))
-            # print(possible_steps[i])
-            # print(possible_steps[i][0])
-            # print(possible_steps[i][1])
-            # print(self.width)
-            # print(self.height)
-            if possible_steps[i][0] < self.width and possible_steps[i][0] >= 0 and possible_steps[i][1] < self.height and possible_steps[i][1] >= 0:
-                # print('yaaaaaaaaaaaas')
-                new_position = self.random.choice(possible_steps)
-                self.model.grid.move_agent(self, new_position)
+            new_position = self.random.choice(possible_steps)
+            self.model.grid.move_agent(self, new_position)
     
     def step(self):
         self.move()
@@ -149,43 +139,6 @@ class Fishtank(Model):
                 else:
                     self.visgrid[i][j] = 0
         return self.visgrid 
-
-    # def make_fishtank(self):
-    #     "make fishtank"
-
-        # self.grid = []
-        # for i in range(self.y):
-        #     row = []
-        #     for j in range(self.x):
-                # "this gives the cell objects a status"
-                # random_number = np.random.choice([0,1], p = [1 - probability_algea, probability_algea])
-                # if random_number == 0:
-                #     status = 0
-                #     row.append(Water())
-                # if random_number == 1:
-                #     status = 1
-                #     row.append(Algea())
-        #         row.append(0)
-        #     self.grid.append(row)
-
-        # for _ in range(self.number_fish):
-        #     randx = np.random.randint(0, self.x)
-        #     randy = np.random.randint(0, self.y)
-        #     for i in range(self.y):
-        #         for j in range(self.x):
-        #                 if i == randy and j == randx:
-        #                     self.grid[i][j] = Fish()
-
-        # self.visgrid = []
-        # for i in range(self.y):
-        #     rowvis = []
-        #     for j in range(self.x):
-        #         rowvis.append(self.grid[i][j].status)
-        #     self.visgrid.append(rowvis)
-        
-        # self.visgrid[0][0] = 3
-        # self.tmp_visgrid = deepcopy(self.visgrid)
-        
 
         
 
