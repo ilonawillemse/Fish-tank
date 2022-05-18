@@ -14,23 +14,31 @@ from mesa import Agent, Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
-
-# class Water():
-#     "class cel makes a cell object with agents"
-#     def __init__(self):
-#         self.status = 0
     
 class Fish(Agent):
     "class Fish makes an agent of the fish"
-    def __init__(self, unique_id, model):
+    def __init__(self, unique_id, model, width, height):
         super().__init__(unique_id, model)
+        self.width = width
+        self.height = height
     
     def move(self): 
         possible_steps = self.model.grid.get_neighborhood(
-            self.pos, moore=True, include_center=False
+            self.pos, moore=True, include_center=True
         )
-        new_position = self.random.choice(possible_steps)
-        self.model.grid.move_agent(self, new_position)
+        for i in range(len(possible_steps)):
+            # print(i)
+            # print(possible_steps)
+            # print(len(possible_steps))
+            # print(possible_steps[i])
+            # print(possible_steps[i][0])
+            # print(possible_steps[i][1])
+            # print(self.width)
+            # print(self.height)
+            if possible_steps[i][0] < self.width and possible_steps[i][0] >= 0 and possible_steps[i][1] < self.height and possible_steps[i][1] >= 0:
+                # print('yaaaaaaaaaaaas')
+                new_position = self.random.choice(possible_steps)
+                self.model.grid.move_agent(self, new_position)
     
     def step(self):
         self.move()
@@ -83,34 +91,42 @@ class Fish(Agent):
 
 class Algea(Agent):
     "class Fish makes an agent of the fish"
-    def __init__(self):
-        self.status = 1
+    def __init__(self, unique_id, model):
+        super().__init__(unique_id, model)
     
-
-
 
 
 class Fishtank(Model):
     "class forest creates a grid with cel objects"
-    def __init__(self, y, x, probability_algea, number_fish):
-        self.x = x
-        self.y = y
-        self.probability_algea = probability_algea
+    def __init__(self, width, height, probability_algea, number_fish):
+        self.width = width
+        self.height = height
+        self.number_algea = width * height * probability_algea
         self.number_fish = number_fish
         
-        self.grid = MultiGrid(x, y, True)
-        self.visgrid = np.zeros((y,x))
+        self.grid = MultiGrid(width, height, False)
+        self.visgrid = np.zeros((height,width))
         self.schedule = RandomActivation(self)
 
         # create agents
         for i in range(self.number_fish):
-            a = Fish(i, self)
+            a = Fish(i, self, self.width, self.height)
             self.schedule.add(a)
 
             # add fish to random grid cel
-            x = self.random.randrange(self.x)
-            y = self.random.randrange(self.y)
+            x = self.random.randrange(self.width)
+            y = self.random.randrange(self.height)
             self.grid.place_agent(a, (x, y))
+        
+        for j in range(self.number_fish, int(self.number_algea)):
+            b = Algea(j, self)
+            self.schedule.add(b)
+
+            # add algea to random grid cel
+            x = self.random.randrange(self.width)
+            y = self.random.randrange(self.height)
+            self.grid.place_agent(b, (x, y))
+
 
         self.datacollector = DataCollector(model_reporters={"Grid": self.status})
 
@@ -119,12 +135,17 @@ class Fishtank(Model):
         self.schedule.step()
     
     def status(self):
-        for i in range(self.y):
-            for j in range(self.x):
+        for i in range(self.height):
+            for j in range(self.width):
                 if len(self.grid[j][i]) > 0:
-                    if isinstance(self.grid[j][i][0], Fish):
-                        self.visgrid[i][j] = 2
-                        print('ja')
+                    for algea in range(len(self.grid[j][i])):
+                        if isinstance(self.grid[j][i][algea], Algea):
+                            self.visgrid[i][j] = 1
+
+                    for fish in range(len(self.grid[j][i])):
+                        if isinstance(self.grid[j][i][fish], Fish):
+                            self.visgrid[i][j] = 2
+                    
                 else:
                     self.visgrid[i][j] = 0
         return self.visgrid 
@@ -173,28 +194,30 @@ if __name__ == "__main__":
     # probability_algea = float(input('probability of algea: '))
     # y = int(input('fishtank height: '))
     # x = int(input('fishtank width: '))
-    y = 20
-    x = 40
+    height = 20
+    width = 40
     # number_fish = int(input('number of fish inside the tank: '))
-    number_fish = 3
+    number_fish = 10
 
     # create a forest object
-    tank = Fishtank(y, x, probability_algea, number_fish)
+    tank = Fishtank(width, height, probability_algea, number_fish)
 
     # creating the animation
     fig, ax = plt.subplots()
-    cmap = colors.ListedColormap(['blue', 'green', 'orange', 'yellow'])
+    cmap = colors.ListedColormap(['blue', 'green', 'orange'])
    
     ims = []
 
-    data = tank.datacollector.get_model_vars_dataframe()
+    # data = tank.datacollector.get_model_vars_dataframe()
     # print(data)
 
-    for _ in range(70):
+    for _ in range(50):
         # data = tank.datacollector.get_model_vars_dataframe()
-        tank.step()
+        # print(data)
         im = ax.imshow(tank.status(), cmap=cmap)
+        # ims = ax.imshow(data, cmap=cmap)
         ims.append([im])
+        tank.step()
 
     ani = animation.ArtistAnimation(fig, ims, interval = 500, blit = True, repeat_delay= 1000)
     plt.axis('off')
