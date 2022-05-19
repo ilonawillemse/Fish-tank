@@ -16,6 +16,7 @@ from mesa.time import RandomActivation
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
 from PIL import Image
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
     
 class Fish(Agent):
     "class Fish makes an agent of the fish"
@@ -66,9 +67,9 @@ class Fish(Agent):
         if len(agents)> 1:
             # print(agents)
             if isinstance(agents[0], Fish) and isinstance(agents[1], Fish):
-                print("FISH ALERTTTTTTTTTTTTTTTT")
+                # print("FISH ALERTTTTTTTTTTTTTTTT")
                 if self.fish_mating_energy():
-                    print('YOU CAN MATE')
+                    # print('YOU CAN MATE')
                     self.mating()
 
     
@@ -76,13 +77,15 @@ class Fish(Agent):
         "the fish eats algea"
 
         self.model.grid.remove_agent(algea)
-        self.energy += 5
+        self.model.schedule.remove(algea)
+        if self.energy < 100:
+            self.energy += 5
     
 
     def move_up(self):        
         "when the fish dies it moves to the top of the tank"
         # pass
-        print(self.pos)
+        # print(self.pos)
         self.die()
         
 
@@ -127,7 +130,7 @@ class Fish(Agent):
     def mating(self):
         "fish make a baby but loose some energy"
 
-        print('MATING')
+        # print('MATING')
         # print(self.model)
 
         fish = Fish(self.model.next_id(), self.model)
@@ -140,6 +143,7 @@ class Algea(Agent):
     "class Algea makes an agent of the algea"
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
+        self.power = 0
     
     def grow(self):
         "makes algea grow"
@@ -147,25 +151,20 @@ class Algea(Agent):
         neighbours = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=True
         )
-
-        # for i in range(len(possible_steps)):
-        #             the_agents = self.model.grid.get_cell_list_contents([possible_steps[i]])
-        #             print(the_agents)
-        #             if len(the_agents)> 0:
-        #                 for option in range(len(the_agents)):
-        #                     if isinstance(the_agents[option], Algea):
-        #                         new_position = possible_steps[i]
-        #                         pass
-        #                     else:
-        #                         new_position = self.random.choice(possible_steps)
-
-        #             else:
-        new_position = self.random.choice(neighbours)
+        # print('jaaaaaaaaa') 
+        
+        new_algea = self.random.choice(neighbours)
                               
         algea = Algea(self.model.next_id(), self.model)
         self.model.schedule.add(algea)
-        self.model.grid.place_agent(algea, new_position)
-        print('jaaaaaaaaa')    
+        self.model.grid.place_agent(algea, new_algea)
+        
+        self.power = 0
+
+    def step(self):
+        self.power += 1
+        if self.power > 20:
+            self.grow()
 
 class Fishtank(Model):
     "class Fishtank creates a tank with agents"
@@ -192,7 +191,8 @@ class Fishtank(Model):
             y = self.random.randrange(self.height)
             self.grid.place_agent(a, (x, y))
         
-        for _ in range(self.number_fish, int(self.number_algea)):
+        # print('hhhhhhhhhhhhhhhhhhoi', int(self.number_algea))
+        for _ in range(int(self.number_algea)):
             b = Algea(self.next_id(), self)
             self.schedule.add(b)
 
@@ -210,8 +210,10 @@ class Fishtank(Model):
     
     def status(self):
         # fish = Image.open("fish.jpeg")
+
         fish = 2
         algea = 1
+
         for i in range(self.height):
             for j in range(self.width):
                 if len(self.grid[j][i]) > 0:
@@ -227,6 +229,7 @@ class Fishtank(Model):
         self.visgrid[0][0] = 3
         return self.visgrid 
 
+
     def no_fish(self):
         for i in range(self.height):
             for j in range(self.width):
@@ -237,26 +240,26 @@ class Fishtank(Model):
         
 
 if __name__ == "__main__":
-    probability_algea = 0.8
+    probability_algea = 0.3
     # probability_algea = float(input('probability of algea: '))
     # y = int(input('fishtank height: '))
     # x = int(input('fishtank width: '))
-    height = 10
-    width = 20
+    height = 20
+    width = 40
     # number_fish = int(input('number of fish inside the tank: '))
-    number_fish = 3
+    number_fish = 20
 
     # create a forest object
     tank = Fishtank(width, height, probability_algea, number_fish)
 
-    # creating the animation
+    # # creating the animation
     fig, ax = plt.subplots()
     cmap = colors.ListedColormap(['blue', 'green', 'orange'])
    
     ims = []
 
-    # data = tank.datacollector.get_model_vars_dataframe()
-    # print(data)
+    # # data = tank.datacollector.get_model_vars_dataframe()
+    # # print(data)
     im = ax.imshow(tank.status(), cmap=cmap)
     ims.append([im])
     tank.step()
@@ -270,7 +273,7 @@ if __name__ == "__main__":
         ims.append([im])
         tank.step()
 
-    ani = animation.ArtistAnimation(fig, ims, interval = 500, blit = True, repeat_delay= 1000)
+    ani = animation.ArtistAnimation(fig, ims, interval = 200, blit = True, repeat_delay= 1000)
 
     plt.xticks(size = 0)
     plt.yticks(size = 0)
