@@ -14,9 +14,11 @@ from mesa import Agent, Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
+from PIL import Image
     
 class Fish(Agent):
     "class Fish makes an agent of the fish"
+
     def __init__(self, unique_id, model, width, height):
         super().__init__(unique_id, model)
         self.width = width
@@ -25,17 +27,19 @@ class Fish(Agent):
     
     def move(self): 
         "decide on neighbour positions"
+
         possible_steps = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=True
         )
         
+
         "make the fish move to nearby algea"
+
         for i in range(len(possible_steps)):
             agents = self.model.grid.get_cell_list_contents([possible_steps[i]])
             if len(agents)> 0:
                 for option in range(len(agents)):
                     if isinstance(agents[option], Algea):
-                        agent = agents[option]
                         new_position = possible_steps[i]
                         pass
             else:
@@ -44,7 +48,9 @@ class Fish(Agent):
         self.model.grid.move_agent(self, new_position)
         self.energy -= 1
 
+
         "make the fish eat the algea"
+
         agents = self.model.grid.get_cell_list_contents([self.pos])
         if len(agents)> 1:
             for option in range(len(agents)):
@@ -54,40 +60,59 @@ class Fish(Agent):
                 
 
     
-    def eat(self, agent): 
-        self.model.grid.remove_agent(agent)
-        self.energy += 2
+    def eat(self, algea): 
+        "the fish eats algea"
+
+        self.model.grid.remove_agent(algea)
+        self.energy += 5
     
     def move_up(self):        
         "when the fish dies it moves to the top of the tank"
-        # self.model.grid.remove_agent()
-        pass
+
+        self.die()
+        
+    def die(self):
+        "the fish dies / dissapears"
+
+        agents = self.model.grid.get_cell_list_contents([self.pos])
+        if len(agents)> 0:
+            for option in range(len(agents)):
+                if isinstance(agents[option], Fish):
+                    fish = agents[option]
+                    self.model.grid.remove_agent(fish)
+        else: 
+            pass
+        
         
     def step(self):
+        "the fish moves when it still has enegery, otherwise dies"
+
         if self.fish_energy():
             self.move()
 
-        # else:
-        #     self.move_up()
+        else:
+            try:
+                self.move_up()
+            except:
+                pass
 
     def fish_energy(self):
+        "tells whether the fish still got some energy"
+
         print(self.energy)
         if self.energy > 0:
             return True
-        else:
-            self.move_up()
-            return False
         
 
 
 class Algea(Agent):
-    "class Fish makes an agent of the fish"
+    "class Algea makes an agent of the algea"
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
     
 
 class Fishtank(Model):
-    "class forest creates a grid with cel objects"
+    "class Fishtank creates a tank with agents"
     def __init__(self, width, height, probability_algea, number_fish):
         self.width = width
         self.height = height
@@ -125,22 +150,30 @@ class Fishtank(Model):
         self.schedule.step()
     
     def status(self):
+        # fish = Image.open("fish.jpeg")
+        fish = 2
+        algea = 1
         for i in range(self.height):
             for j in range(self.width):
                 if len(self.grid[j][i]) > 0:
-                    for algea in range(len(self.grid[j][i])):
-                        if isinstance(self.grid[j][i][algea], Algea):
-                            self.visgrid[i][j] = 1
-
-                    for fish in range(len(self.grid[j][i])):
-                        if isinstance(self.grid[j][i][fish], Fish):
-                            self.visgrid[i][j] = 2
+                    for something in range(len(self.grid[j][i])):
+                        if isinstance(self.grid[j][i][something], Algea):
+                            self.visgrid[i][j] = algea
+                        if isinstance(self.grid[j][i][something], Fish):
+                            self.visgrid[i][j] = fish
                     
                 else:
                     self.visgrid[i][j] = 0
 
-        
+        self.visgrid[0][0] = 3
         return self.visgrid 
+
+    def no_fish(self):
+        for i in range(self.height):
+            for j in range(self.width):
+                if self.visgrid[i][j] == 2:
+                    return True
+        return False
 
         
 
@@ -152,7 +185,7 @@ if __name__ == "__main__":
     height = 10
     width = 20
     # number_fish = int(input('number of fish inside the tank: '))
-    number_fish = 10
+    number_fish = 7
 
     # create a forest object
     tank = Fishtank(width, height, probability_algea, number_fish)
@@ -165,8 +198,11 @@ if __name__ == "__main__":
 
     # data = tank.datacollector.get_model_vars_dataframe()
     # print(data)
-  
-    for _ in range(50):
+    im = ax.imshow(tank.status(), cmap=cmap)
+    ims.append([im])
+    tank.step()
+    # for _ in range(50):
+    while tank.no_fish():
         # data = tank.datacollector.get_model_vars_dataframe()
         # print(data)
         im = ax.imshow(tank.status(), cmap=cmap)
