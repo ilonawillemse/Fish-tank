@@ -4,6 +4,7 @@ Animated image using a precomputed list of images
 =================================================
 
 """
+from shutil import which
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -19,10 +20,8 @@ from PIL import Image
 class Fish(Agent):
     "class Fish makes an agent of the fish"
 
-    def __init__(self, unique_id, model, width, height):
+    def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.width = width
-        self.height = height
         self.energy = 10
     
     def move(self): 
@@ -36,10 +35,10 @@ class Fish(Agent):
         "make the fish move to nearby algea"
 
         for i in range(len(possible_steps)):
-            agents = self.model.grid.get_cell_list_contents([possible_steps[i]])
-            if len(agents)> 0:
-                for option in range(len(agents)):
-                    if isinstance(agents[option], Algea):
+            the_agents = self.model.grid.get_cell_list_contents([possible_steps[i]])
+            if len(the_agents)> 0:
+                for option in range(len(the_agents)):
+                    if isinstance(the_agents[option], Algea):
                         new_position = possible_steps[i]
                         pass
             else:
@@ -57,7 +56,17 @@ class Fish(Agent):
                 if isinstance(agents[option], Algea):
                     agent_algea = agents[option]
                     self.eat(agent_algea)
-                
+        
+
+        "make the fish mate with each other"
+
+        if len(agents)> 1:
+            print(agents)
+            if isinstance(agents[0], Fish) and isinstance(agents[1], Fish):
+                print("FISH ALERTTTTTTTTTTTTTTTT")
+                if self.fish_mating_energy():
+                    print('YOU CAN MATE')
+                    self.mating()
 
     
     def eat(self, algea): 
@@ -66,11 +75,13 @@ class Fish(Agent):
         self.model.grid.remove_agent(algea)
         self.energy += 5
     
+
     def move_up(self):        
         "when the fish dies it moves to the top of the tank"
-
+        pass
         self.die()
         
+
     def die(self):
         "the fish dies / dissapears"
 
@@ -92,9 +103,10 @@ class Fish(Agent):
 
         else:
             try:
-                self.move_up()
+                self.die()
             except:
                 pass
+
 
     def fish_energy(self):
         "tells whether the fish still got some energy"
@@ -102,7 +114,26 @@ class Fish(Agent):
         print(self.energy)
         if self.energy > 0:
             return True
+
+
+    def fish_mating_energy(self):
+        "tells whether the fish has enough mating energy"
+        if self.energy > 20:
+            return True
         
+
+    def mating(self):
+        "fish make a baby but loose some energy"
+
+        print('MATING')
+        i = random.randint(100, 1000)
+        print(i)
+        fish = Fish(i, self)
+        print(fish)
+        print(self.pos)
+        # self.model.schedule.add(fish)
+        self.model.grid.place_agent(fish, self.pos)
+        self.energy -= 10
 
 
 class Algea(Agent):
@@ -125,7 +156,7 @@ class Fishtank(Model):
 
         # create agents
         for i in range(self.number_fish):
-            a = Fish(i, self, self.width, self.height)
+            a = Fish(i, self)
             self.schedule.add(a)
 
             # add fish to random grid cel
@@ -178,14 +209,14 @@ class Fishtank(Model):
         
 
 if __name__ == "__main__":
-    probability_algea = 0.4
+    probability_algea = 0.8
     # probability_algea = float(input('probability of algea: '))
     # y = int(input('fishtank height: '))
     # x = int(input('fishtank width: '))
-    height = 10
-    width = 20
+    height = 5
+    width = 10
     # number_fish = int(input('number of fish inside the tank: '))
-    number_fish = 7
+    number_fish = 2
 
     # create a forest object
     tank = Fishtank(width, height, probability_algea, number_fish)
@@ -201,8 +232,9 @@ if __name__ == "__main__":
     im = ax.imshow(tank.status(), cmap=cmap)
     ims.append([im])
     tank.step()
-    # for _ in range(50):
-    while tank.no_fish():
+
+    for _ in range(50):
+    # while tank.no_fish():
         # data = tank.datacollector.get_model_vars_dataframe()
         # print(data)
         im = ax.imshow(tank.status(), cmap=cmap)
@@ -211,10 +243,12 @@ if __name__ == "__main__":
         tank.step()
 
     ani = animation.ArtistAnimation(fig, ims, interval = 500, blit = True, repeat_delay= 1000)
-    plt.xlabel('width')
-    plt.ylabel('height')
-    plt.xticks(size = 0)
-    plt.yticks(size = 0)
 
+    # plt.xticks(size = 0)
+    # plt.yticks(size = 0)
+    # plt.tick_params(axis = 'both', which = 'both', bottom = False, top = False)
+    plt.axis('off')
+    # plt.xlabel('width')
+    # plt.ylabel('height')
     ani.save("fish.gif")
     
