@@ -23,11 +23,10 @@ class Fish(Agent):
 
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.energy = 10
+        self.energy = 20
     
     def move(self): 
         "decide on neighbour positions"
-        # print(self.pos, self.energy, self.unique_id)
         possible_steps = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=True
         )
@@ -47,7 +46,6 @@ class Fish(Agent):
 
             else:
                 new_position = self.random.choice(possible_steps)
-        # print(' new pos : ',new_position, self.unique_id)
         self.model.grid.move_agent(self, new_position)
         self.energy -= 1
 
@@ -66,11 +64,8 @@ class Fish(Agent):
         "make the fish mate with each other"
 
         if len(agents)> 1:
-            # print(agents)
             if isinstance(agents[0], Fish) and isinstance(agents[1], Fish):
-                # print("FISH ALERTTTTTTTTTTTTTTTT")
                 if self.fish_mating_energy():
-                    # print('YOU CAN MATE')
                     self.mating()
 
     
@@ -99,8 +94,6 @@ class Fish(Agent):
                     fish = agents[option]
                     self.model.grid.remove_agent(fish)
                     self.model.schedule.remove(fish)
-        # else: 
-        #     pass
         
         
     def step(self):
@@ -116,55 +109,58 @@ class Fish(Agent):
     def fish_energy(self):
         "tells whether the fish still got some energy"
 
-        print(self.energy)
         if self.energy > 0:
             return True
 
 
     def fish_mating_energy(self):
         "tells whether the fish has enough mating energy"
-        if self.energy > 40:
+        if self.energy > 20:
             return True
         
 
     def mating(self):
         "fish make a baby but loose some energy"
 
-        # print('MATING')
-        # print(self.model)
-
         fish = Fish(self.model.next_id(), self.model)
         self.model.schedule.add(fish)
         self.model.grid.place_agent(fish, self.pos)
-        self.energy -= 15
+        self.energy -= 10
 
 
 class Algea(Agent):
     "class Algea makes an agent of the algea"
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.power = 0
     
     def grow(self):
         "makes algea grow with a chance"
 
-        if random.randint(0, 4) < 3:
-            neighbours = self.model.grid.get_neighborhood(
-                self.pos, moore=True, include_center=True
-            )
-            
-            new_algea = self.random.choice(neighbours)
-                                
-            algea = Algea(self.model.next_id(), self.model)
-            self.model.schedule.add(algea)
-            self.model.grid.place_agent(algea, new_algea)
+        neighbours = self.model.grid.get_neighborhood(
+            self.pos, moore=True, include_center=True
+        )
         
-        self.power = 0
+        new_algea = self.random.choice(neighbours)
+                            
+        algea = Algea(self.model.next_id(), self.model)
+        self.model.schedule.add(algea)
+        self.model.grid.place_agent(algea, new_algea)
+        
+    def random_grow(self):
+        x = self.random.randrange(self.model.width)
+        y = self.random.randrange(self.model.height)
+
+        algea = Algea(self.model.next_id(), self.model)
+        self.model.schedule.add(algea)
+        self.model.grid.place_agent(algea, (x, y))
 
     def step(self):
-        self.power += 1
-        if self.power > 20:
+        growth = random.randint(0, 1000)
+        if growth < 8:
             self.grow()
+        random_growth = random.randint(0, 1000)
+        if random_growth < 5:
+            self.random_grow()
 
 class Fishtank(Model):
     "class Fishtank creates a tank with agents"
@@ -226,7 +222,7 @@ class Fishtank(Model):
                 else:
                     self.visgrid[i][j] = 0
 
-        self.visgrid[0][0] = 3
+        # self.visgrid[0][0] = 3
         return self.visgrid 
 
 
@@ -244,10 +240,10 @@ if __name__ == "__main__":
     # probability_algea = float(input('probability of algea: '))
     # y = int(input('fishtank height: '))
     # x = int(input('fishtank width: '))
-    height = 20
-    width = 40
+    height = 40
+    width = 80
     # number_fish = int(input('number of fish inside the tank: '))
-    number_fish = 20
+    number_fish = 40
 
     # create a forest object
     tank = Fishtank(width, height, probability_algea, number_fish)
@@ -264,7 +260,8 @@ if __name__ == "__main__":
     ims.append([im])
     tank.step()
 
-    for _ in range(200):
+    for i in range(300):
+        print(i)
     # while tank.no_fish():
         # data = tank.datacollector.get_model_vars_dataframe()
         # print(data)
