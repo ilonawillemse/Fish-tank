@@ -59,7 +59,8 @@ class Fish(Agent):
             for option in range(len(agents)):
                 if isinstance(agents[option], Algea):
                     agent_algea = agents[option]
-                    self.eat(agent_algea)
+                    if  self.energy < 150:
+                        self.eat(agent_algea)
         
 
         "make the fish mate with each other"
@@ -78,8 +79,7 @@ class Fish(Agent):
 
         self.model.grid.remove_agent(algea)
         self.model.schedule.remove(algea)
-        if self.energy < 100:
-            self.energy += 5
+        self.energy += 10
     
 
     def move_up(self):        
@@ -123,7 +123,7 @@ class Fish(Agent):
 
     def fish_mating_energy(self):
         "tells whether the fish has enough mating energy"
-        if self.energy > 20:
+        if self.energy > 40:
             return True
         
 
@@ -136,7 +136,7 @@ class Fish(Agent):
         fish = Fish(self.model.next_id(), self.model)
         self.model.schedule.add(fish)
         self.model.grid.place_agent(fish, self.pos)
-        self.energy -= 10
+        self.energy -= 15
 
 
 class Algea(Agent):
@@ -146,18 +146,18 @@ class Algea(Agent):
         self.power = 0
     
     def grow(self):
-        "makes algea grow"
+        "makes algea grow with a chance"
 
-        neighbours = self.model.grid.get_neighborhood(
-            self.pos, moore=True, include_center=True
-        )
-        # print('jaaaaaaaaa') 
-        
-        new_algea = self.random.choice(neighbours)
-                              
-        algea = Algea(self.model.next_id(), self.model)
-        self.model.schedule.add(algea)
-        self.model.grid.place_agent(algea, new_algea)
+        if random.randint(0, 4) < 3:
+            neighbours = self.model.grid.get_neighborhood(
+                self.pos, moore=True, include_center=True
+            )
+            
+            new_algea = self.random.choice(neighbours)
+                                
+            algea = Algea(self.model.next_id(), self.model)
+            self.model.schedule.add(algea)
+            self.model.grid.place_agent(algea, new_algea)
         
         self.power = 0
 
@@ -264,7 +264,7 @@ if __name__ == "__main__":
     ims.append([im])
     tank.step()
 
-    for _ in range(50):
+    for _ in range(200):
     # while tank.no_fish():
         # data = tank.datacollector.get_model_vars_dataframe()
         # print(data)
@@ -279,5 +279,5 @@ if __name__ == "__main__":
     plt.yticks(size = 0)
     plt.xlabel('width')
     plt.ylabel('height')
-    ani.save("fish.gif")
+    ani.save("fish3.gif")
     
