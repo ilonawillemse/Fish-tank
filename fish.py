@@ -26,7 +26,7 @@ class Fish(Agent):
     
     def move(self): 
         "decide on neighbour positions"
-
+        # print(self.pos, self.energy, self.unique_id)
         possible_steps = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=True
         )
@@ -41,9 +41,12 @@ class Fish(Agent):
                     if isinstance(the_agents[option], Algea):
                         new_position = possible_steps[i]
                         pass
+                    else:
+                        new_position = self.random.choice(possible_steps)
+
             else:
                 new_position = self.random.choice(possible_steps)
-
+        # print(' new pos : ',new_position, self.unique_id)
         self.model.grid.move_agent(self, new_position)
         self.energy -= 1
 
@@ -61,7 +64,7 @@ class Fish(Agent):
         "make the fish mate with each other"
 
         if len(agents)> 1:
-            print(agents)
+            # print(agents)
             if isinstance(agents[0], Fish) and isinstance(agents[1], Fish):
                 print("FISH ALERTTTTTTTTTTTTTTTT")
                 if self.fish_mating_energy():
@@ -78,7 +81,8 @@ class Fish(Agent):
 
     def move_up(self):        
         "when the fish dies it moves to the top of the tank"
-        pass
+        # pass
+        print(self.pos)
         self.die()
         
 
@@ -91,8 +95,9 @@ class Fish(Agent):
                 if isinstance(agents[option], Fish):
                     fish = agents[option]
                     self.model.grid.remove_agent(fish)
-        else: 
-            pass
+                    self.model.schedule.remove(fish)
+        # else: 
+        #     pass
         
         
     def step(self):
@@ -102,10 +107,7 @@ class Fish(Agent):
             self.move()
 
         else:
-            try:
-                self.die()
-            except:
-                pass
+            self.move_up()
 
 
     def fish_energy(self):
@@ -126,12 +128,10 @@ class Fish(Agent):
         "fish make a baby but loose some energy"
 
         print('MATING')
-        i = random.randint(100, 1000)
-        print(i)
-        fish = Fish(i, self)
-        print(fish)
-        print(self.pos)
-        # self.model.schedule.add(fish)
+        # print(self.model)
+
+        fish = Fish(self.model.next_id(), self.model)
+        self.model.schedule.add(fish)
         self.model.grid.place_agent(fish, self.pos)
         self.energy -= 10
 
@@ -141,10 +141,37 @@ class Algea(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
     
+    def grow(self):
+        "makes algea grow"
+
+        neighbours = self.model.grid.get_neighborhood(
+            self.pos, moore=True, include_center=True
+        )
+
+        # for i in range(len(possible_steps)):
+        #             the_agents = self.model.grid.get_cell_list_contents([possible_steps[i]])
+        #             print(the_agents)
+        #             if len(the_agents)> 0:
+        #                 for option in range(len(the_agents)):
+        #                     if isinstance(the_agents[option], Algea):
+        #                         new_position = possible_steps[i]
+        #                         pass
+        #                     else:
+        #                         new_position = self.random.choice(possible_steps)
+
+        #             else:
+        new_position = self.random.choice(neighbours)
+                              
+        algea = Algea(self.model.next_id(), self.model)
+        self.model.schedule.add(algea)
+        self.model.grid.place_agent(algea, new_position)
+        print('jaaaaaaaaa')    
 
 class Fishtank(Model):
     "class Fishtank creates a tank with agents"
     def __init__(self, width, height, probability_algea, number_fish):
+        super().__init__()
+
         self.width = width
         self.height = height
         self.number_algea = width * height * probability_algea
@@ -153,10 +180,11 @@ class Fishtank(Model):
         self.grid = MultiGrid(width, height, False)
         self.visgrid = np.zeros((height,width))
         self.schedule = RandomActivation(self)
+        
 
         # create agents
-        for i in range(self.number_fish):
-            a = Fish(i, self)
+        for _ in range(self.number_fish):
+            a = Fish(self.next_id(), self)
             self.schedule.add(a)
 
             # add fish to random grid cel
@@ -164,8 +192,8 @@ class Fishtank(Model):
             y = self.random.randrange(self.height)
             self.grid.place_agent(a, (x, y))
         
-        for j in range(self.number_fish, int(self.number_algea)):
-            b = Algea(j, self)
+        for _ in range(self.number_fish, int(self.number_algea)):
+            b = Algea(self.next_id(), self)
             self.schedule.add(b)
 
             # add algea to random grid cel
@@ -213,10 +241,10 @@ if __name__ == "__main__":
     # probability_algea = float(input('probability of algea: '))
     # y = int(input('fishtank height: '))
     # x = int(input('fishtank width: '))
-    height = 5
-    width = 10
+    height = 10
+    width = 20
     # number_fish = int(input('number of fish inside the tank: '))
-    number_fish = 2
+    number_fish = 3
 
     # create a forest object
     tank = Fishtank(width, height, probability_algea, number_fish)
@@ -244,11 +272,9 @@ if __name__ == "__main__":
 
     ani = animation.ArtistAnimation(fig, ims, interval = 500, blit = True, repeat_delay= 1000)
 
-    # plt.xticks(size = 0)
-    # plt.yticks(size = 0)
-    # plt.tick_params(axis = 'both', which = 'both', bottom = False, top = False)
-    plt.axis('off')
-    # plt.xlabel('width')
-    # plt.ylabel('height')
+    plt.xticks(size = 0)
+    plt.yticks(size = 0)
+    plt.xlabel('width')
+    plt.ylabel('height')
     ani.save("fish.gif")
     
