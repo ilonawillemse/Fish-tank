@@ -230,6 +230,24 @@ class Fishtank(Model):
 
         # self.visgrid[0][0] = 3
         return self.visgrid 
+    
+    def fish_counting(self):
+        self.fish_counter = 0
+
+        for i in range(self.height):
+            for j in range(self.width):
+                if self.visgrid[i][j] == 2:
+                    self.fish_counter += 1
+        return self.fish_counter
+    
+    def algea_counting(self):
+        self.algea_counter = 0
+
+        for i in range(self.height):
+            for j in range(self.width):
+                if self.visgrid[i][j] == 1:
+                    self.algea_counter += 1
+        return self.algea_counter
 
 
     def no_fish(self):
@@ -242,7 +260,7 @@ class Fishtank(Model):
         
 
 if __name__ == "__main__":
-    probability_algea = 0.1
+    probability_algea = 0.0
     # probability_algea = float(input('probability of algea: '))
     # y = int(input('fishtank height: '))
     # x = int(input('fishtank width: '))
@@ -259,23 +277,33 @@ if __name__ == "__main__":
     cmap = colors.ListedColormap(['blue', 'green', 'orange'])
    
     ims = []
+    algea = []
+    fish = []
 
     # # data = tank.datacollector.get_model_vars_dataframe()
     # # print(data)
     im = ax.imshow(tank.status(), cmap=cmap)
     ims.append([im])
-    tank.step()
+    algea.append(tank.algea_counting())
+    fish.append(tank.fish_counting())
+  
 
-    # for i in range(100):
-    #     print(i)
-    while tank.no_fish():
+    for i in range(40):
+        print(i)
+    # while tank.no_fish():
+        tank.step()
+        algea.append(tank.algea_counting())
+        fish.append(tank.fish_counting())
+
         # data = tank.datacollector.get_model_vars_dataframe()
         # print(data)
         im = ax.imshow(tank.status(), cmap=cmap)
         # ims = ax.imshow(data, cmap=cmap)
         ims.append([im])
-        tank.step()
-
+        # tank.step()
+        
+    print(algea)
+    print(fish)
     ani = animation.ArtistAnimation(fig, ims, interval = 200, blit = True, repeat_delay= 1000)
 
     plt.xticks(size = 0)
