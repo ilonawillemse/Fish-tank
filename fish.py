@@ -215,6 +215,8 @@ class Fishtank(Model):
 
         fish = 2
         algea = 1
+        self.fish_counter = 0
+        self.algea_counter = 0
 
         for i in range(self.height):
             for j in range(self.width):
@@ -222,31 +224,23 @@ class Fishtank(Model):
                     for something in range(len(self.grid[j][i])):
                         if isinstance(self.grid[j][i][something], Algea):
                             self.visgrid[i][j] = algea
+                            self.algea_counter += 1
                         if isinstance(self.grid[j][i][something], Fish):
                             self.visgrid[i][j] = fish
+                            self.fish_counter += 1
                     
                 else:
                     self.visgrid[i][j] = 0
 
         # self.visgrid[0][0] = 3
+        print('fish', self.fish_counter)
+        print('algea', self.algea_counter)
         return self.visgrid 
     
     def fish_counting(self):
-        self.fish_counter = 0
-
-        for i in range(self.height):
-            for j in range(self.width):
-                if self.visgrid[i][j] == 2:
-                    self.fish_counter += 1
         return self.fish_counter
     
     def algea_counting(self):
-        self.algea_counter = 0
-
-        for i in range(self.height):
-            for j in range(self.width):
-                if self.visgrid[i][j] == 1:
-                    self.algea_counter += 1
         return self.algea_counter
 
 
@@ -260,7 +254,7 @@ class Fishtank(Model):
         
 
 if __name__ == "__main__":
-    probability_algea = 0.0
+    probability_algea = 0.2
     # probability_algea = float(input('probability of algea: '))
     # y = int(input('fishtank height: '))
     # x = int(input('fishtank width: '))
