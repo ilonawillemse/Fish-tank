@@ -43,6 +43,9 @@ $ python3 fish.py
 - end goal
     - [] visualise how fish populations are influenced by light strength
 
+- addition
+    - [] try visualising the animated plot at the same time as the animation, that would be super cool
+
 ## libraries
 ```
 - numpy

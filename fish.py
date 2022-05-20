@@ -272,10 +272,10 @@ if __name__ == "__main__":
     # probability_algea = float(input('probability of algea: '))
     # y = int(input('fishtank height: '))
     # x = int(input('fishtank width: '))
-    height = 50
-    width = 100
+    height = 20
+    width = 40
     # number_fish = int(input('number of fish inside the tank: '))
-    number_fish = 50
+    number_fish = 10
 
     # light_strength = int(input('lightstrength 1-100: '))
     light_strength = 50
@@ -289,6 +289,9 @@ if __name__ == "__main__":
     cmap = colors.ListedColormap(['blue', 'green', 'orange'])
    
     ims = []
+    ims2 = []
+
+
     algea = []
     fish = []
 
@@ -296,14 +299,18 @@ if __name__ == "__main__":
     # # print(data)
     im = ax.imshow(tank.status(), cmap=cmap)
     ims.append([im])
-    algea.append(tank.algea_counting())
-    fish.append(tank.fish_counting())
-  
+    ims2.append([im])
+
+    counter_list = []
+    counter = 0
+
+
+
 
     for i in range(200):
         print(i)
     # while tank.no_fish():
-        tank.step()
+        # tank.step()
         algea.append(tank.algea_counting())
         fish.append(tank.fish_counting())
 
@@ -312,15 +319,36 @@ if __name__ == "__main__":
         im = ax.imshow(tank.status(), cmap=cmap)
         # ims = ax.imshow(data, cmap=cmap)
         ims.append([im])
-        # tank.step()
+        # ims2.append([im])
+        tank.step()
         
-    print(algea)
-    print(fish)
+        counter +=1
+        counter_list.append(counter)
+
+    # save the animation of the fishtank
     ani = animation.ArtistAnimation(fig, ims, interval = 200, blit = True, repeat_delay= 1000)
+    # ani2 = animation.ArtistAnimation(fig, ims2, interval = 200, blit = True, repeat_delay= 1000)
 
     plt.xticks(size = 0)
     plt.yticks(size = 0)
     plt.xlabel('width')
     plt.ylabel('height')
+
     ani.save("fish1.gif")
-    
+    # ani2.save("save.gif")
+
+
+    print(algea)
+    print(fish)
+
+    # plot the algea and fish values
+    plt.figure(1)
+    plt.subplot(211)
+    plt.plot(counter_list, algea)
+    plt.ylabel('algea')
+    plt.subplot(212)
+    plt.plot(counter_list, fish)
+    plt.xlabel('steps')
+    plt.ylabel('fish')
+
+    plt.savefig('plot.png')
