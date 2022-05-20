@@ -64,6 +64,7 @@ class Fish(Agent):
         "make the fish mate with each other"
 
         if len(agents)> 1:
+            # print(agents)
             if isinstance(agents[0], Fish) and isinstance(agents[1], Fish):
                 if self.fish_mating_energy():
                     self.mating()
@@ -80,7 +81,7 @@ class Fish(Agent):
     def move_up(self):        
         "when the fish dies it moves to the top of the tank"
 
-        new = self.pos[1] - 1
+        new = self.pos[1] - 2
         new_pos = (self.pos[0], new)
 
         if new >= 0:
@@ -143,7 +144,7 @@ class Algea(Agent):
         "makes algea grow with a chance"
 
         neighbours = self.model.grid.get_neighborhood(
-            self.pos, moore=True, include_center=True
+            self.pos, moore=True, include_center=False
         )
         
         new_algea = self.random.choice(neighbours)
@@ -161,22 +162,38 @@ class Algea(Agent):
         self.model.grid.place_agent(algea, (x, y))
 
     def step(self):
+        # print(self.model.light_strength)
         growth = random.randint(0, 1000)
-        if growth < 8:
-            self.grow()
         random_growth = random.randint(0, 1000)
-        if random_growth < 5:
-            self.random_grow()
+
+        if self.model.light_strength >= 30 and self.model.light_strength <= 60:
+            if growth < 5:
+                self.grow()
+            if random_growth < 4:
+                self.random_grow()
+        
+        if self.model.light_strength < 30:
+            if growth < 3:
+                self.grow()
+            if random_growth < 2:
+                self.random_grow()
+       
+        if self.model.light_strength > 60:
+            if growth < 8:
+                self.grow()
+            if random_growth < 7:
+                self.random_grow()
 
 class Fishtank(Model):
     "class Fishtank creates a tank with agents"
-    def __init__(self, width, height, probability_algea, number_fish):
+    def __init__(self, width, height, probability_algea, number_fish, light_strength):
         super().__init__()
 
         self.width = width
         self.height = height
         self.number_algea = width * height * probability_algea
         self.number_fish = number_fish
+        self.light_strength = light_strength
         
         self.grid = MultiGrid(width, height, False)
         self.visgrid = np.zeros((height,width))
@@ -193,7 +210,6 @@ class Fishtank(Model):
             y = self.random.randrange(self.height)
             self.grid.place_agent(a, (x, y))
         
-        # print('hhhhhhhhhhhhhhhhhhoi', int(self.number_algea))
         for _ in range(int(self.number_algea)):
             b = Algea(self.next_id(), self)
             self.schedule.add(b)
@@ -215,6 +231,7 @@ class Fishtank(Model):
 
         fish = 2
         algea = 1
+
         self.fish_counter = 0
         self.algea_counter = 0
 
@@ -232,9 +249,6 @@ class Fishtank(Model):
                 else:
                     self.visgrid[i][j] = 0
 
-        # self.visgrid[0][0] = 3
-        print('fish', self.fish_counter)
-        print('algea', self.algea_counter)
         return self.visgrid 
     
     def fish_counting(self):
@@ -258,13 +272,17 @@ if __name__ == "__main__":
     # probability_algea = float(input('probability of algea: '))
     # y = int(input('fishtank height: '))
     # x = int(input('fishtank width: '))
-    height = 20
-    width = 40
+    height = 50
+    width = 100
     # number_fish = int(input('number of fish inside the tank: '))
-    number_fish = 5
+    number_fish = 50
+
+    # light_strength = int(input('lightstrength 1-100: '))
+    light_strength = 50
+
 
     # create a forest object
-    tank = Fishtank(width, height, probability_algea, number_fish)
+    tank = Fishtank(width, height, probability_algea, number_fish, light_strength)
 
     # # creating the animation
     fig, ax = plt.subplots()
@@ -282,7 +300,7 @@ if __name__ == "__main__":
     fish.append(tank.fish_counting())
   
 
-    for i in range(40):
+    for i in range(200):
         print(i)
     # while tank.no_fish():
         tank.step()
