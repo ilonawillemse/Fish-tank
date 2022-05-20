@@ -3,7 +3,7 @@ This code creates a situation that visualises a fishtank within an animation.
 
 ![Fish visualisation](doc/image/prototype.png)
 ```
-The fish move can swim, reproduce and eat algea. Algea can expand it's population and appear randomly by chance.
+The fish move can swim, reproduce and eat algea. They stop eating the algea when they are full. Algea can expand it's population and appear randomly by chance.
 ```
 
 ## How to run

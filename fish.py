@@ -79,9 +79,15 @@ class Fish(Agent):
 
     def move_up(self):        
         "when the fish dies it moves to the top of the tank"
-        # pass
-        # print(self.pos)
-        self.die()
+
+        new = self.pos[1] - 1
+        new_pos = (self.pos[0], new)
+
+        if new >= 0:
+            self.model.grid.move_agent(self, new_pos)
+        
+        else:
+            self.die()
         
 
     def die(self):
@@ -236,14 +242,14 @@ class Fishtank(Model):
         
 
 if __name__ == "__main__":
-    probability_algea = 0.3
+    probability_algea = 0.1
     # probability_algea = float(input('probability of algea: '))
     # y = int(input('fishtank height: '))
     # x = int(input('fishtank width: '))
-    height = 40
-    width = 80
+    height = 20
+    width = 40
     # number_fish = int(input('number of fish inside the tank: '))
-    number_fish = 40
+    number_fish = 5
 
     # create a forest object
     tank = Fishtank(width, height, probability_algea, number_fish)
@@ -260,9 +266,9 @@ if __name__ == "__main__":
     ims.append([im])
     tank.step()
 
-    for i in range(300):
-        print(i)
-    # while tank.no_fish():
+    # for i in range(100):
+    #     print(i)
+    while tank.no_fish():
         # data = tank.datacollector.get_model_vars_dataframe()
         # print(data)
         im = ax.imshow(tank.status(), cmap=cmap)
@@ -276,5 +282,5 @@ if __name__ == "__main__":
     plt.yticks(size = 0)
     plt.xlabel('width')
     plt.ylabel('height')
-    ani.save("fish3.gif")
+    ani.save("fish1.gif")
     
