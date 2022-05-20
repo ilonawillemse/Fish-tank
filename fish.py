@@ -17,6 +17,7 @@ from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
 from PIL import Image
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+from pyparsing import counted_array
     
 class Fish(Agent):
     "class Fish makes an agent of the fish"
@@ -132,7 +133,7 @@ class Fish(Agent):
         fish = Fish(self.model.next_id(), self.model)
         self.model.schedule.add(fish)
         self.model.grid.place_agent(fish, self.pos)
-        self.energy -= 10
+        self.energy -= 5
 
 
 class Algea(Agent):
@@ -167,9 +168,9 @@ class Algea(Agent):
         random_growth = random.randint(0, 1000)
 
         if self.model.light_strength >= 30 and self.model.light_strength <= 60:
-            if growth < 5:
+            if growth < 8:
                 self.grow()
-            if random_growth < 4:
+            if random_growth < 5:
                 self.random_grow()
         
         if self.model.light_strength < 30:
@@ -307,8 +308,8 @@ if __name__ == "__main__":
 
 
 
-    for i in range(200):
-        print(i)
+    for i in range(400):
+    #     print(i)
     # while tank.no_fish():
         # tank.step()
         algea.append(tank.algea_counting())
@@ -323,11 +324,12 @@ if __name__ == "__main__":
         tank.step()
         
         counter +=1
+        print(counter)
         counter_list.append(counter)
 
-    # save the animation of the fishtank
+    # # save the animation of the fishtank
     ani = animation.ArtistAnimation(fig, ims, interval = 200, blit = True, repeat_delay= 1000)
-    # ani2 = animation.ArtistAnimation(fig, ims2, interval = 200, blit = True, repeat_delay= 1000)
+    # # ani2 = animation.ArtistAnimation(fig, ims2, interval = 200, blit = True, repeat_delay= 1000)
 
     plt.xticks(size = 0)
     plt.yticks(size = 0)
@@ -338,17 +340,22 @@ if __name__ == "__main__":
     # ani2.save("save.gif")
 
 
-    print(algea)
-    print(fish)
+    # print(algea)
+    # print(fish)
 
     # plot the algea and fish values
-    plt.figure(1)
+    # plt.figure(1)
     plt.subplot(211)
-    plt.plot(counter_list, algea)
-    plt.ylabel('algea')
+    # save the animation of the fishtank
+    # ani = animation.ArtistAnimation(fig, ims, interval = 200, blit = True, repeat_delay= 1000)
+    # plt.plot(counter_list, algea)
+    plt.ylabel('animation')
+    
     plt.subplot(212)
-    plt.plot(counter_list, fish)
-    plt.xlabel('steps')
-    plt.ylabel('fish')
+    plt.plot(counter_list, fish, label = 'fish')
+    plt.plot(counter_list, algea, label = 'algea')
+    plt.legend()
+    plt.xlabel('swims')
+    plt.ylabel('algea/fish')
 
     plt.savefig('plot.png')
