@@ -2,7 +2,6 @@
 =================================================
 Animated image using a precomputed list of images
 =================================================
-
 """
 from shutil import which
 import numpy as np
@@ -167,23 +166,10 @@ class Algea(Agent):
         growth = random.randint(0, 1000)
         random_growth = random.randint(0, 1000)
 
-        if self.model.light_strength >= 30 and self.model.light_strength <= 60:
-            if growth < 8:
-                self.grow()
-            if random_growth < 5:
-                self.random_grow()
-        
-        if self.model.light_strength < 30:
-            if growth < 3:
-                self.grow()
-            if random_growth < 2:
-                self.random_grow()
-       
-        if self.model.light_strength > 60:
-            if growth < 8:
-                self.grow()
-            if random_growth < 7:
-                self.random_grow()
+        if growth < 8:
+            self.grow()
+        if random_growth < 5:
+            self.random_grow()
 
 class Fishtank(Model):
     "class Fishtank creates a tank with agents"
@@ -268,8 +254,10 @@ class Fishtank(Model):
 
         
 
+        
+
 if __name__ == "__main__":
-    probability_algea = 0.2
+    probability_algea = 0.3
     # probability_algea = float(input('probability of algea: '))
     # y = int(input('fishtank height: '))
     # x = int(input('fishtank width: '))
@@ -278,7 +266,7 @@ if __name__ == "__main__":
     # number_fish = int(input('number of fish inside the tank: '))
     number_fish = 10
 
-    # light_strength = int(input('lightstrength 1-100: '))
+    # light_strength = int(input('lightstrength in %: '))
     light_strength = 50
 
 
@@ -300,62 +288,68 @@ if __name__ == "__main__":
     # # print(data)
     im = ax.imshow(tank.status(), cmap=cmap)
     ims.append([im])
-    ims2.append([im])
+
+    # algea.append(tank.algea_counting())
+    # fish.append(tank.fish_counting())
 
     counter_list = []
     counter = 0
 
+    # print(im)
 
 
-
-    for i in range(400):
-    #     print(i)
+    for i in range(600):
+    # #     print(i)
     # while tank.no_fish():
-        # tank.step()
-        algea.append(tank.algea_counting())
-        fish.append(tank.fish_counting())
-
-        # data = tank.datacollector.get_model_vars_dataframe()
-        # print(data)
-        im = ax.imshow(tank.status(), cmap=cmap)
-        # ims = ax.imshow(data, cmap=cmap)
-        ims.append([im])
-        # ims2.append([im])
-        tank.step()
-        
         counter +=1
         print(counter)
         counter_list.append(counter)
+        algea.append(tank.algea_counting())
+        fish.append(tank.fish_counting())
 
+    #     # data = tank.datacollector.get_model_vars_dataframe()
+    #     # print(data)
+
+        # im = ax.imshow(tank.status(), cmap = cmap)
+        # ims.append([im])
+
+        
+    #     plt.subplot(211)
+    #     plt.imshow(tank.status(), cmap = cmap)
+    #     plt.subplot(212)
+    #     plt.plot(counter_list, fish, label = 'fish')
+    #     plt.plot(counter_list, algea, label = 'algea')
+    #     plt.xlabel('swims')
+    #     plt.ylabel('fish')
+        
+    #     plt.savefig('fig.png')
+    #     im =  Image.open("fig.png")
+    #     print(im)
+
+    #     ims.append(im) 
+    #     print(ims)       
+        tank.step()
+        
     # # save the animation of the fishtank
-    ani = animation.ArtistAnimation(fig, ims, interval = 200, blit = True, repeat_delay= 1000)
-    # # ani2 = animation.ArtistAnimation(fig, ims2, interval = 200, blit = True, repeat_delay= 1000)
-
-    plt.xticks(size = 0)
-    plt.yticks(size = 0)
-    plt.xlabel('width')
-    plt.ylabel('height')
-
-    ani.save("fish1.gif")
-    # ani2.save("save.gif")
-
-
-    # print(algea)
-    # print(fish)
-
-    # plot the algea and fish values
-    # plt.figure(1)
-    plt.subplot(211)
-    # save the animation of the fishtank
     # ani = animation.ArtistAnimation(fig, ims, interval = 200, blit = True, repeat_delay= 1000)
-    # plt.plot(counter_list, algea)
-    plt.ylabel('animation')
-    
+
+    # plt.xticks(size = 0)
+    # plt.yticks(size = 0)
+    # plt.xlabel('width')
+    # plt.ylabel('height')
+
+    # ani.save("fish.gif")
+
+    print(algea)
+    print(fish)
+
+    plt.subplot(211)
+    plt.plot(counter_list, algea, label = 'algea')
+    plt.ylabel('algea')
+
     plt.subplot(212)
     plt.plot(counter_list, fish, label = 'fish')
-    plt.plot(counter_list, algea, label = 'algea')
-    plt.legend()
     plt.xlabel('swims')
-    plt.ylabel('algea/fish')
-
-    plt.savefig('plot.png')
+    plt.ylabel('fish')
+    
+    plt.savefig('fig.png')
