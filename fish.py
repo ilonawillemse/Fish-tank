@@ -24,6 +24,7 @@ class Fish(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.energy = 20
+        self.mating_counter = 0
     
     def move(self): 
         "decide on neighbour positions"
@@ -57,8 +58,7 @@ class Fish(Agent):
             for option in range(len(agents)):
                 if isinstance(agents[option], Algea):
                     agent_algea = agents[option]
-                    if  self.energy < 150:
-                        self.eat(agent_algea)
+                    self.eat(agent_algea)
         
 
         "make the fish mate with each other"
@@ -68,6 +68,8 @@ class Fish(Agent):
             if isinstance(agents[0], Fish) and isinstance(agents[1], Fish):
                 if self.fish_mating_energy():
                     self.mating()
+        
+        self.mating_counter +=1
 
     
     def eat(self, algea): 
@@ -122,17 +124,18 @@ class Fish(Agent):
 
     def fish_mating_energy(self):
         "tells whether the fish has enough mating energy"
-        if self.energy > 20:
+        if self.energy > 30:
             return True
         
 
     def mating(self):
         "fish make a baby but loose some energy"
-
-        fish = Fish(self.model.next_id(), self.model)
-        self.model.schedule.add(fish)
-        self.model.grid.place_agent(fish, self.pos)
-        self.energy -= 5
+        if self.mating_counter > 9:
+            fish = Fish(self.model.next_id(), self.model)
+            self.model.schedule.add(fish)
+            self.model.grid.place_agent(fish, self.pos)
+            self.energy -= 10
+            self.mating_counter = 0
 
 
 class Algea(Agent):
@@ -154,21 +157,26 @@ class Algea(Agent):
         self.model.grid.place_agent(algea, new_algea)
         
     def random_grow(self):
-        x = self.random.randrange(self.model.width)
-        y = self.random.randrange(self.model.height)
 
-        algea = Algea(self.model.next_id(), self.model)
-        self.model.schedule.add(algea)
-        self.model.grid.place_agent(algea, (x, y))
+        agents = self.model.grid.get_cell_list_contents([self.pos])
+
+        if len(agents) < 3:
+            print('ja')
+            x = self.random.randrange(self.model.width)
+            y = self.random.randrange(self.model.height)
+
+            algea = Algea(self.model.next_id(), self.model)
+            self.model.schedule.add(algea)
+            self.model.grid.place_agent(algea, (x, y))
 
     def step(self):
         # print(self.model.light_strength)
         growth = random.randint(0, 1000)
         random_growth = random.randint(0, 1000)
 
-        if growth < 8:
-            self.grow()
-        if random_growth < 5:
+        # if growth < 10:
+        #     self.grow()
+        if random_growth < 10:
             self.random_grow()
 
 class Fishtank(Model):
@@ -289,8 +297,6 @@ if __name__ == "__main__":
     im = ax.imshow(tank.status(), cmap=cmap)
     ims.append([im])
 
-    # algea.append(tank.algea_counting())
-    # fish.append(tank.fish_counting())
 
     counter_list = []
     counter = 0
@@ -298,7 +304,7 @@ if __name__ == "__main__":
     # print(im)
 
 
-    for i in range(600):
+    for i in range(10000):
     # #     print(i)
     # while tank.no_fish():
         counter +=1
@@ -310,8 +316,8 @@ if __name__ == "__main__":
     #     # data = tank.datacollector.get_model_vars_dataframe()
     #     # print(data)
 
-        # im = ax.imshow(tank.status(), cmap = cmap)
-        # ims.append([im])
+        im = ax.imshow(tank.status(), cmap = cmap)
+        ims.append([im])
 
         
     #     plt.subplot(211)
@@ -333,10 +339,10 @@ if __name__ == "__main__":
     # # save the animation of the fishtank
     # ani = animation.ArtistAnimation(fig, ims, interval = 200, blit = True, repeat_delay= 1000)
 
-    # plt.xticks(size = 0)
-    # plt.yticks(size = 0)
-    # plt.xlabel('width')
-    # plt.ylabel('height')
+    plt.xticks(size = 0)
+    plt.yticks(size = 0)
+    plt.xlabel('width')
+    plt.ylabel('height')
 
     # ani.save("fish.gif")
 

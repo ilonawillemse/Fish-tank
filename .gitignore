@@ -1,7 +1,6 @@
 *ilona*
 __pycache__/
-fish.jpeg
+*.jpeg
 *.gif
 picture*
-plot_fish.png
-plot.png
+*.png
