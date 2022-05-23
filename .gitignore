@@ -3,4 +3,6 @@ __pycache__/
 *.jpeg
 *.gif
 picture*
-*.png
+fish*.png
+*fish.png
+*fig.png
