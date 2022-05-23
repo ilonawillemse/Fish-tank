@@ -2,6 +2,7 @@
 This code creates a situation that visualises a fishtank within an animation.
 
 ![Fish visualisation](doc/image/prototype.png)
+![Fish visualisation](doc/image/example_AlgeaFish.png)
 ```
 The fish move can swim, reproduce and eat algea. They stop eating the algea when they are full. Algea can expand it's population and appear randomly by chance.
 ```
@@ -38,13 +39,14 @@ $ python3 fish.py
     - [] different species of fish
     - [] fish grow when they eat.
     - [] different kinds of fish that only mate with the same species.
-    - [] adding slides in which the user can change certain values.
 
 - end goal
     - [] visualise how fish populations are influenced by light strength
 
 - addition
     - [] try visualising the animated plot at the same time as the animation, that would be super cool
+
+- research question: what influence does the light strength have on the population of fish in a fishtank?
 
 ## libraries
 ```

@@ -161,7 +161,6 @@ class Algea(Agent):
         agents = self.model.grid.get_cell_list_contents([self.pos])
 
         if len(agents) < 3:
-            print('ja')
             x = self.random.randrange(self.model.width)
             y = self.random.randrange(self.model.height)
 
@@ -171,8 +170,8 @@ class Algea(Agent):
 
     def step(self):
         # print(self.model.light_strength)
-        growth = random.randint(0, 1000)
-        random_growth = random.randint(0, 1000)
+        # growth = random.randint(0, 100)
+        random_growth = random.randint(0, 100)
 
         # if growth < 10:
         #     self.grow()
@@ -266,12 +265,8 @@ class Fishtank(Model):
 
 if __name__ == "__main__":
     probability_algea = 0.3
-    # probability_algea = float(input('probability of algea: '))
-    # y = int(input('fishtank height: '))
-    # x = int(input('fishtank width: '))
     height = 20
     width = 40
-    # number_fish = int(input('number of fish inside the tank: '))
     number_fish = 10
 
     # light_strength = int(input('lightstrength in %: '))
@@ -286,9 +281,6 @@ if __name__ == "__main__":
     cmap = colors.ListedColormap(['blue', 'green', 'orange'])
    
     ims = []
-    ims2 = []
-
-
     algea = []
     fish = []
 
@@ -301,12 +293,9 @@ if __name__ == "__main__":
     counter_list = []
     counter = 0
 
-    # print(im)
-
-
-    for i in range(10000):
+    # for i in range(10000):
+    while tank.no_fish():
     # #     print(i)
-    # while tank.no_fish():
         counter +=1
         print(counter)
         counter_list.append(counter)
@@ -331,18 +320,18 @@ if __name__ == "__main__":
     #     plt.savefig('fig.png')
     #     im =  Image.open("fig.png")
     #     print(im)
-
     #     ims.append(im) 
-    #     print(ims)       
+    #     print(ims)   
+    
         tank.step()
         
     # # save the animation of the fishtank
     # ani = animation.ArtistAnimation(fig, ims, interval = 200, blit = True, repeat_delay= 1000)
 
-    plt.xticks(size = 0)
-    plt.yticks(size = 0)
-    plt.xlabel('width')
-    plt.ylabel('height')
+    # plt.xticks(size = 0)
+    # plt.yticks(size = 0)
+    # plt.xlabel('width')
+    # plt.ylabel('height')
 
     # ani.save("fish.gif")
 
