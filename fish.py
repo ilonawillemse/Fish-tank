@@ -17,7 +17,7 @@ from mesa.datacollection import DataCollector
 from PIL import Image
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from pyparsing import counted_array
-    
+
 class Fish(Agent):
     "class Fish makes an agent of the fish"
 
@@ -25,6 +25,7 @@ class Fish(Agent):
         super().__init__(unique_id, model)
         self.energy = 20
         self.mating_counter = 0
+        self.age = 0
     
     def move(self): 
         "decide on neighbour positions"
@@ -70,6 +71,7 @@ class Fish(Agent):
                     self.mating()
         
         self.mating_counter +=1
+        self.age +=1
 
     
     def eat(self, algea): 
@@ -108,7 +110,8 @@ class Fish(Agent):
     def step(self):
         "the fish moves when it still has enegery, otherwise dies"
 
-        if self.fish_energy():
+        if self.fish_energy() and self.age < 80:
+            print('00000000000')
             self.move()
 
         else:
@@ -175,12 +178,12 @@ class Algea(Agent):
 
         # if growth < 10:
         #     self.grow()
-        if random_growth < 10:
+        if random_growth < 8:
             self.random_grow()
 
 class Fishtank(Model):
     "class Fishtank creates a tank with agents"
-    def __init__(self, width, height, probability_algea, number_fish, light_strength):
+    def __init__(self, width, height, probability_algea, number_fish, light_strength, number_blue_fish):
         super().__init__()
 
         self.width = width
@@ -268,13 +271,14 @@ if __name__ == "__main__":
     height = 20
     width = 40
     number_fish = 10
+    number_blue_fish = 10
 
     # light_strength = int(input('lightstrength in %: '))
     light_strength = 50
 
 
     # create a forest object
-    tank = Fishtank(width, height, probability_algea, number_fish, light_strength)
+    tank = Fishtank(width, height, probability_algea, number_fish, light_strength, number_blue_fish)
 
     # # creating the animation
     fig, ax = plt.subplots()
@@ -293,8 +297,8 @@ if __name__ == "__main__":
     counter_list = []
     counter = 0
 
-    # for i in range(10000):
-    while tank.no_fish():
+    for i in range(1000):
+    # while tank.no_fish():
     # #     print(i)
         counter +=1
         print(counter)

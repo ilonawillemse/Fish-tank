@@ -21,6 +21,7 @@ $ python3 fish.py
     - [x] energy can be obtained by eating algea.
     - [x] with energy fish can mate and bare children.
     - [x] fish die when no more energy
+    - [] add age
 
 - algea
     - [] can grow with light.

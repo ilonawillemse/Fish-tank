@@ -35,6 +35,7 @@ friday:
 - animatie en visualisatie onder elkaar plotten als animatie
 - trying to create a balanced ecosystem within the tank
 
+
 week 2:
 monday:
 - whenever I try to insert some lightstrength the programm starts working really slow
@@ -43,3 +44,6 @@ monday:
 - made an option so that the algea have a maximum in growing but removed this too
 - removed the saturation function
 - had to start over from friday because the program was not functioning anymore as I would have liked
+
+tuesday:
+- fish have an age now
