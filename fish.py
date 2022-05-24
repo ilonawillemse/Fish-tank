@@ -145,19 +145,6 @@ class Algea(Agent):
     "class Algea makes an agent of the algea"
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-    
-    def grow(self):
-        "makes algea grow with a chance"
-
-        neighbours = self.model.grid.get_neighborhood(
-            self.pos, moore=True, include_center=False
-        )
-        
-        new_algea = self.random.choice(neighbours)
-                            
-        algea = Algea(self.model.next_id(), self.model)
-        self.model.schedule.add(algea)
-        self.model.grid.place_agent(algea, new_algea)
         
     def random_grow(self):
 
@@ -172,14 +159,11 @@ class Algea(Agent):
             self.model.grid.place_agent(algea, (x, y))
 
     def step(self):
-        # print(self.model.light_strength)
-        # growth = random.randint(0, 100)
         random_growth = random.randint(0, 100)
 
-        # if growth < 10:
-        #     self.grow()
-        if random_growth < 8:
+        if random_growth < 8 * self.model.light_strength:
             self.random_grow()
+
 
 class Fishtank(Model):
     "class Fishtank creates a tank with agents"
@@ -190,7 +174,7 @@ class Fishtank(Model):
         self.height = height
         self.number_algea = width * height * probability_algea
         self.number_fish = number_fish
-        self.light_strength = light_strength
+        self.light_strength = light_strength / 50
         
         self.grid = MultiGrid(width, height, False)
         self.visgrid = np.zeros((height,width))
