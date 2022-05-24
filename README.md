@@ -24,7 +24,7 @@ $ python3 fish.py
     - [x] add age
 
 - algea
-    - [] can grow with light.
+    - [x] can grow with light.
     - [x] number gets reduced by fish that eat algea.
 
 - input
@@ -32,7 +32,7 @@ $ python3 fish.py
     - [x] starting algea density
     - [x] starting number of fish
 
-- [] the more fish, the less light, the less algea.
+- [x] the more fish, the less light, the less algea.
 - [x] the less algea the less food for the fish, so no mating.
 
 - optional
