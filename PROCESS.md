@@ -47,3 +47,6 @@ monday:
 
 tuesday:
 - fish have an age now
+- change visualisation to mesa advanced
+
+- change agent to self...............

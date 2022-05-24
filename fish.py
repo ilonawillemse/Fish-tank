@@ -26,6 +26,7 @@ class Fish(Agent):
         self.energy = 20
         self.mating_counter = 0
         self.age = 0
+        self.type = 'fish'
     
     def move(self): 
         "decide on neighbour positions"
@@ -111,7 +112,6 @@ class Fish(Agent):
         "the fish moves when it still has enegery, otherwise dies"
 
         if self.fish_energy() and self.age < 80:
-            print('00000000000')
             self.move()
 
         else:
@@ -145,6 +145,7 @@ class Algea(Agent):
     "class Algea makes an agent of the algea"
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
+        self.type = 'algea'
         
     def random_grow(self):
 
@@ -201,17 +202,14 @@ class Fishtank(Model):
             self.grid.place_agent(b, (x, y))
 
 
-        self.datacollector = DataCollector(model_reporters={"Grid": self.status})
+        # self.datacollector = DataCollector(model_reporters={"Grid": self.status})
 
     def step(self):
-        self.datacollector.collect(self)
+        # self.datacollector.collect(self)
         self.schedule.step()
     
     def status(self):
         # fish = Image.open("fish.jpeg")
-
-        fish = 2
-        algea = 1
 
         self.fish_counter = 0
         self.algea_counter = 0
@@ -221,10 +219,10 @@ class Fishtank(Model):
                 if len(self.grid[j][i]) > 0:
                     for something in range(len(self.grid[j][i])):
                         if isinstance(self.grid[j][i][something], Algea):
-                            self.visgrid[i][j] = algea
+                            self.visgrid[i][j] = 1
                             self.algea_counter += 1
                         if isinstance(self.grid[j][i][something], Fish):
-                            self.visgrid[i][j] = fish
+                            self.visgrid[i][j] = 2
                             self.fish_counter += 1
                     
                 else:
@@ -247,7 +245,24 @@ class Fishtank(Model):
         return False
 
         
+def agent_portrayal(agent):
+    portrayal = {"Shape": "circle",
+                 "Filled": "true"}
 
+    if agent.type == 'fish':
+        portrayal["Color"] = "red"
+        portrayal["Layer"] = 2
+    if agent.type == 'algea':
+        portrayal["Color"] = "green"
+        portrayal["Layer"] = 1
+        portrayal["r"] = 1
+        portrayal["Shape"]= "circle"
+    else:
+        portrayal["Color"] = "blue"
+        portrayal["Layer"] = 0
+        portrayal["r"] = 1
+
+    return portrayal
         
 
 if __name__ == "__main__":
@@ -260,6 +275,24 @@ if __name__ == "__main__":
     # light_strength = int(input('lightstrength in %: '))
     light_strength = 50
 
+
+
+    # grid = CanvasGrid(agent_portrayal, 40, 20, 500, 500)
+
+    # # chart = ChartModule([{"Label": "Fish",
+    # #                     "Color": "Black"}],
+    # #                     data_collector_name='datacollector')
+
+    # server = ModularServer(Fishtank,
+    #                     [grid],
+    #                     "Fishtank",
+    #                     {"width":40, "height": 20, "probability_algea": 0.3, "number_fish": 10, "light_strength": light_strength})
+    # server.port = 8521 # The default
+
+
+    # server.launch()
+
+    
 
     # create a forest object
     tank = Fishtank(width, height, probability_algea, number_fish, light_strength, number_blue_fish)
