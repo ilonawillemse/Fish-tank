@@ -26,7 +26,7 @@ class BigFish(Agent):
 
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.big_energy = 200
+        self.energy = 200
         self.big_age = 0
         self.type = 'bigfish'
         self.big_mating_counter = 0
@@ -53,7 +53,7 @@ class BigFish(Agent):
             else:
                 new_position = self.random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
-        self.big_energy -= 1
+        self.energy -= 5
         self.big_look()
 
 
@@ -73,9 +73,7 @@ class BigFish(Agent):
                     self.current_big_fish_count += 1
         
         if self.current_big_fish_count > 1 and len(agents) < 5:
-            # print(agents)
-            if self.big_fish_mating_energy():
-                    self.big_mating()
+            if self.big_fish_mating_energy() and self.big_age > 15:
                     self.big_mating()
         
         self.big_mating_counter +=1
@@ -86,7 +84,7 @@ class BigFish(Agent):
         "the fish eats algea"
         self.model.grid.remove_agent(fish)
         self.model.schedule.remove(fish)
-        self.big_energy += 200
+        self.energy += 200
     
 
     def big_move_up(self):        
@@ -103,7 +101,7 @@ class BigFish(Agent):
         
 
     def big_die(self):
-        "the fish dies / dissapears"
+        "the big fish dies / dissapears"
         self.model.grid.remove_agent(self)
         self.model.schedule.remove(self)
         
@@ -121,23 +119,25 @@ class BigFish(Agent):
     def big_fish_energy(self):
         "tells whether the fish still got some energy"
 
-        if self.big_energy > 0:
+        if self.energy > 0:
             return True
 
 
     def big_fish_mating_energy(self):
         "tells whether the fish has enough mating energy"
-        if self.big_energy > 80:
+        if self.energy > 80:
             return True
         
 
     def big_mating(self):
-        "fish make a baby but loose some energy"
-        if self.big_mating_counter > 6:
-            bigfish = BigFish(self.model.next_id(), self.model)
-            self.model.schedule.add(bigfish)
-            self.model.grid.place_agent(bigfish, self.pos)
-            self.big_energy -= 20
+        "bigfish make 2 babies but loose some energy"
+        if self.big_mating_counter > 10:
+            for _ in range(2):
+                bigfish = BigFish(self.model.next_id(), self.model)
+                self.model.schedule.add(bigfish)
+                self.model.grid.place_agent(bigfish, self.pos)
+            
+            self.energy -= 30
             self.big_mating_counter = 0
 
 
@@ -194,9 +194,7 @@ class Fish(Agent):
                     self.current_fish_count += 1
         
         if self.current_fish_count > 1:
-            # print(agents)
-            # print('yes')
-            if self.fish_mating_energy():
+            if self.fish_mating_energy() and self.age > 3:
                     self.mating()
         
         self.mating_counter +=1
@@ -215,7 +213,6 @@ class Fish(Agent):
 
         new = self.pos[1] + 1
         new_pos = (self.pos[0], new)
-        print(new_pos)
 
         if new < self.model.height:
             self.model.grid.move_agent(self, new_pos)
@@ -261,7 +258,7 @@ class Fish(Agent):
             self.model.schedule.add(fish)
             self.model.grid.place_agent(fish, self.pos)
             self.energy -= 15
-            self.mating_counter = 0
+            self.mating_counter44444444 = 0
 
 
 class Algea(Agent):
@@ -282,7 +279,7 @@ class Algea(Agent):
     def step(self):
         random_growth = self.random.randint(0, 100)
 
-        if random_growth < 5 * self.model.light_strength:
+        if random_growth < 6 * self.model.light_strength:
             self.random_grow()
 
 
@@ -396,34 +393,64 @@ class Fishtank(Model):
 def agent_portrayal(agent):
     # add age and color change
     portrayal = {"Filled": "true"}
-    
-    if agent.type == 'algea':
-        portrayal["Color"] = "green"
-        portrayal["Layer"] = 1
-        portrayal["Shape"] = "rect"
-        portrayal["h"] = 1
-        portrayal["w"] = 1
 
-    
-    elif agent.type == 'fish':
-        portrayal["Color"] = "orange"
+
+# For an image:
+#                 The image must be placed in the same directory from which the
+#                 server is launched. An image has the attributes "x", "y",
+#                 "scale", "text" and "text_color".
+#         "Color": The color to draw the shape in; needs to be a valid HTML
+#                  color, e.g."Red" or "#AA08F8"
+#         "Filled": either "true" or "false", and determines whether the shape is
+#                   filled or not.
+#         "Layer": Layer number of 0 or above; higher-numbered layers are drawn
+#                  above lower-numbered layers.
+#         "text": The text to be inscribed inside the Shape. Normally useful for
+#                 showing the unique_id of the agent.
+#         "text_color": The color to draw the inscribed text. Should be given in
+#                       conjunction of "text" property.
+
+
+
+    if agent.type == 'fish':
         portrayal["Layer"] = 2
-        portrayal["r"] = 0.5
-        portrayal["Shape"] = "circle"
+
+        if agent.energy == 0:
+            portrayal["Shape"] = "doc/image/deadfish.png"
+            portrayal["x"] = 1
+            portrayal["y"] = 1
+            portrayal["scale"] = 0.8
+        else:
+            portrayal["Shape"] = "doc/image/fish.png"
+            portrayal["x"] = 1
+            portrayal["y"] = 1
+            portrayal["scale"] = 0.7     
 
     
-    elif agent.type == 'bigfish':
-        portrayal["Color"] = "red"
-        portrayal["Layer"] = 2       
-        portrayal["r"] = 0.9 
-        portrayal["Shape"] = "circle"
+    elif agent.type == 'bigfish': 
+        portrayal["Layer"] = 2 
 
-    else:
-        portrayal["Color"] = "blue"
-        portrayal["Layer"] = 0
-        portrayal["r"] = 1
-        portrayal["Shape"] = "circle"
+        if agent.energy == 0:
+            portrayal["Shape"] = "doc/image/deadshark.png"
+            portrayal["x"] = 1
+            portrayal["y"] = 1
+            portrayal["scale"] = 1     
+        
+        else:
+            portrayal["Shape"] = "doc/image/shark.jpg"
+            portrayal["x"] = 1
+            portrayal["y"] = 1
+            portrayal["scale"] = 1
 
+
+
+    elif agent.type == 'algea':
+        portrayal["Layer"] = 1
+
+        portrayal["Shape"] = "doc/image/algea.jpg"
+        portrayal["x"] = 1
+        portrayal["y"] = 1
+        portrayal["scale"] = 1
 
     return portrayal
         
@@ -452,7 +479,7 @@ if __name__ == "__main__":
     server = ModularServer(Fishtank,
                         [grid,chart2,chart],
                         "Fishtank Ilona Willemse",
-                        {"width":20, "height": 20, "probability_algea": 0.3, "number_fish": 30, "light_strength": light_strength, "number_big_fish": 5})
+                        {"width":20, "height": 20, "probability_algea": 0.3, "number_fish": 30, "light_strength": light_strength, "number_big_fish": 6})
     server.port = 8521 # The default
 
 
