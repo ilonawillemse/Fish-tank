@@ -26,7 +26,7 @@ class BigFish(Agent):
 
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.energy = 200
+        self.big_energy = 200
         self.big_age = 0
         self.type = 'bigfish'
         self.big_mating_counter = 0
@@ -53,7 +53,7 @@ class BigFish(Agent):
             else:
                 new_position = self.random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
-        self.energy -= 5
+        self.big_energy -= 5
         self.big_look()
 
 
@@ -84,7 +84,7 @@ class BigFish(Agent):
         "the fish eats algea"
         self.model.grid.remove_agent(fish)
         self.model.schedule.remove(fish)
-        self.energy += 200
+        self.big_energy += 200
     
 
     def big_move_up(self):        
@@ -119,13 +119,13 @@ class BigFish(Agent):
     def big_fish_energy(self):
         "tells whether the fish still got some energy"
 
-        if self.energy > 0:
+        if self.big_energy > 0:
             return True
 
 
     def big_fish_mating_energy(self):
         "tells whether the fish has enough mating energy"
-        if self.energy > 80:
+        if self.big_energy > 80:
             return True
         
 
@@ -137,7 +137,7 @@ class BigFish(Agent):
                 self.model.schedule.add(bigfish)
                 self.model.grid.place_agent(bigfish, self.pos)
             
-            self.energy -= 30
+            self.big_energy -= 30
             self.big_mating_counter = 0
 
 
@@ -420,27 +420,58 @@ def agent_portrayal(agent):
             portrayal["x"] = 1
             portrayal["y"] = 1
             portrayal["scale"] = 0.8
+        
         else:
-            portrayal["Shape"] = "doc/image/fish.png"
-            portrayal["x"] = 1
-            portrayal["y"] = 1
-            portrayal["scale"] = 0.7     
+            if agent.age < 10:
+                portrayal["Shape"] = "doc/image/fish.png"
+                portrayal["x"] = 1
+                portrayal["y"] = 1
+                portrayal["scale"] = 0.3 
+
+            elif agent.age < 30:
+                portrayal["Shape"] = "doc/image/fish.png"
+                portrayal["x"] = 1
+                portrayal["y"] = 1
+                portrayal["scale"] = 0.5
+                portrayal["Layer"] = 3
+
+            else:
+                portrayal["Shape"] = "doc/image/fish.png"
+                portrayal["x"] = 1
+                portrayal["y"] = 1
+                portrayal["scale"] = 0.8
+                portrayal["Layer"] = 4
 
     
     elif agent.type == 'bigfish': 
-        portrayal["Layer"] = 2 
+        portrayal["Layer"] = 5 
 
-        if agent.energy == 0:
+        if agent.big_energy == 0:
             portrayal["Shape"] = "doc/image/deadshark.png"
             portrayal["x"] = 1
             portrayal["y"] = 1
-            portrayal["scale"] = 1     
-        
+            portrayal["scale"] = 1    
         else:
-            portrayal["Shape"] = "doc/image/shark.jpg"
-            portrayal["x"] = 1
-            portrayal["y"] = 1
-            portrayal["scale"] = 1
+            if agent.big_age < 10:      
+                portrayal["Shape"] = "doc/image/shark.jpg"
+                portrayal["x"] = 1
+                portrayal["y"] = 1
+                portrayal["scale"] = 0.5
+
+            if agent.big_age < 30:      
+                portrayal["Shape"] = "doc/image/shark.jpg"
+                portrayal["x"] = 1
+                portrayal["y"] = 1
+                portrayal["scale"] = 0.8
+                portrayal["Layer"] = 6
+
+
+            else:
+                portrayal["Shape"] = "doc/image/shark.jpg"
+                portrayal["x"] = 1
+                portrayal["y"] = 1
+                portrayal["scale"] = 1
+                portrayal["Layer"] = 7
 
 
 
