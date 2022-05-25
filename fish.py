@@ -3,26 +3,22 @@
 Animated image using a precomputed list of images
 =================================================
 """
-from shutil import which
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import random
 from matplotlib import colors
-from copy import deepcopy
 from mesa import Agent, Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
 from PIL import Image
-from matplotlib.offsetbox import OffsetImage, AnnotationBbox
-from pyparsing import counted_array
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
 from mesa.datacollection import DataCollector
 
 class BigFish(Agent):
-    "class Fish makes an agent of the fish"
+    "class BigFish makes an agent of the big fish"
 
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
@@ -38,7 +34,7 @@ class BigFish(Agent):
             self.pos, moore=True, include_center=True
         )
         
-        "make the fish move to nearby fish"
+        "make the big fish move to nearby fish"
 
         for i in range(len(possible_steps)):
             the_agents = self.model.grid.get_cell_list_contents([possible_steps[i]])
@@ -58,7 +54,7 @@ class BigFish(Agent):
 
 
     def big_look(self):
-        "make the fish eat all the other fish at the same location"
+        "make the big fish eat all the other smaller fish at the same location"
         self.current_big_fish_count = 0
 
         agents = self.model.grid.get_cell_list_contents([self.pos])
@@ -68,7 +64,7 @@ class BigFish(Agent):
                     agent_fish = agents[option]
                     self.big_eat(agent_fish)
         
-                "make the fish mate with each other at the same location"
+                "make the big fish mate with each other at the same location"
                 if isinstance(agents[option], BigFish):
                     self.current_big_fish_count += 1
         
@@ -81,14 +77,14 @@ class BigFish(Agent):
 
     
     def big_eat(self, fish): 
-        "the fish eats algea"
+        "the big fish eats other smaller fish"
         self.model.grid.remove_agent(fish)
         self.model.schedule.remove(fish)
         self.big_energy += 200
     
 
     def big_move_up(self):        
-        "when the fish dies it moves to the top of the tank"
+        "when the big fish dies it moves to the top of the tank"
 
         new = self.pos[1] + 1
         new_pos = (self.pos[0], new)
@@ -107,7 +103,7 @@ class BigFish(Agent):
         
         
     def step(self):
-        "the fish moves when it still has enegery, otherwise dies"
+        "the big fish moves when it still has enegery, otherwise dies"
 
         if self.big_fish_energy() and self.big_age < 50:
             self.big_move()
@@ -117,20 +113,20 @@ class BigFish(Agent):
 
 
     def big_fish_energy(self):
-        "tells whether the fish still got some energy"
+        "tells whether the big fish still got some energy"
 
         if self.big_energy > 0:
             return True
 
 
     def big_fish_mating_energy(self):
-        "tells whether the fish has enough mating energy"
+        "tells whether the big fish has enough mating energy"
         if self.big_energy > 80:
             return True
         
 
     def big_mating(self):
-        "bigfish make 2 babies but loose some energy"
+        "bigfish makes a baby but looses some energy"
         if self.big_mating_counter > 10:
             for _ in range(2):
                 bigfish = BigFish(self.model.next_id(), self.model)
@@ -258,7 +254,7 @@ class Fish(Agent):
             self.model.schedule.add(fish)
             self.model.grid.place_agent(fish, self.pos)
             self.energy -= 15
-            self.mating_counter44444444 = 0
+            self.mating_counter = 0
 
 
 class Algea(Agent):
@@ -267,7 +263,9 @@ class Algea(Agent):
         super().__init__(unique_id, model)
         self.type = 'algea'
         
-    def random_grow(self):        
+    def random_grow(self): 
+        "makes the algea grow at random locations as long as that gridpoint is empty"
+       
         x = self.random.randrange(self.model.width)
         y = self.random.randrange(self.model.height)
         
@@ -277,6 +275,8 @@ class Algea(Agent):
             self.model.grid.place_agent(algea, (x,y))
 
     def step(self):
+        "with chance the algea can grow in time"
+
         random_growth = self.random.randint(0, 100)
 
         if random_growth < 6 * self.model.light_strength:
@@ -305,12 +305,12 @@ class Fishtank(Model):
                                 "algea": self.algea})
         
 
-        # create agents
+        "agents are being created and added to the grid and schedule"
         for _ in range(self.number_fish):
             a = Fish(self.next_id(), self)
             self.schedule.add(a)
 
-            # add fish to random grid cel
+            # fish
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
             self.grid.place_agent(a, (x, y))
@@ -319,7 +319,7 @@ class Fishtank(Model):
             b = Algea(self.next_id(), self)
             self.schedule.add(b)
 
-            # add algea to random grid cel
+            # algea
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
             self.grid.place_agent(b, (x, y))
@@ -328,7 +328,7 @@ class Fishtank(Model):
             c = BigFish(self.next_id(), self)
             self.schedule.add(c)
 
-            # add algea to random grid cel
+            # big fish
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
             self.grid.place_agent(c, (x, y))
@@ -338,22 +338,6 @@ class Fishtank(Model):
         self.datacollector.collect(self)
         self.schedule.step()  
     
-    def big_fish_counting(self):
-        return self.big_fish_counter
-
-    def fish_counting(self):
-        return self.fish_counter
-    
-    def algea_counting(self):
-        return self.algea_counter
-
-
-    def no_fish(self):
-        for i in range(self.height):
-            for j in range(self.width):
-                if self.visgrid[i][j] == 2:
-                    return True
-        return False
 
     def fish(self):
         fish_counter = 0
@@ -366,6 +350,7 @@ class Fishtank(Model):
                             fish_counter += 1
         return fish_counter
     
+
     def bigfish(self):
         big_fish_counter = 0
 
@@ -376,6 +361,7 @@ class Fishtank(Model):
                         if isinstance(self.grid[j][i][something], BigFish):
                             big_fish_counter += 1
         return big_fish_counter
+
 
     def algea(self):
         algea_counter = 0
@@ -391,27 +377,9 @@ class Fishtank(Model):
 
         
 def agent_portrayal(agent):
-    # add age and color change
+    "give proporties to the agents for visualization"
+
     portrayal = {"Filled": "true"}
-
-
-# For an image:
-#                 The image must be placed in the same directory from which the
-#                 server is launched. An image has the attributes "x", "y",
-#                 "scale", "text" and "text_color".
-#         "Color": The color to draw the shape in; needs to be a valid HTML
-#                  color, e.g."Red" or "#AA08F8"
-#         "Filled": either "true" or "false", and determines whether the shape is
-#                   filled or not.
-#         "Layer": Layer number of 0 or above; higher-numbered layers are drawn
-#                  above lower-numbered layers.
-#         "text": The text to be inscribed inside the Shape. Normally useful for
-#                 showing the unique_id of the agent.
-#         "text_color": The color to draw the inscribed text. Should be given in
-#                       conjunction of "text" property.
-
-
-
     if agent.type == 'fish':
         portrayal["Layer"] = 2
 
@@ -474,7 +442,6 @@ def agent_portrayal(agent):
                 portrayal["Layer"] = 7
 
 
-
     elif agent.type == 'algea':
         portrayal["Layer"] = 1
 
@@ -487,17 +454,10 @@ def agent_portrayal(agent):
         
 
 if __name__ == "__main__":
-    probability_algea = 0.3
-    height = 20
-    width = 30
-    number_fish = 20
-    number_big_fish = 4
+    "ask light strenght input from user to decide how fast the algea grow"
+    light_strength = int(input('lightstrength in %: '))
 
-    # light_strength = int(input('lightstrength in %: '))
-    light_strength = 50
-
-
-
+    "create a visualization of the animation and fish / algea countings"
     grid = CanvasGrid(agent_portrayal, 20, 20, 500, 300)
 
     chart = ChartModule([{"Label": "fish", "Color": "Orange"}, 
@@ -512,6 +472,5 @@ if __name__ == "__main__":
                         "Fishtank Ilona Willemse",
                         {"width":20, "height": 20, "probability_algea": 0.3, "number_fish": 30, "light_strength": light_strength, "number_big_fish": 6})
     server.port = 8521 # The default
-
 
     server.launch()

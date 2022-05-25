@@ -5,7 +5,7 @@ This code creates a situation that visualises a fishtank within an animation.
 ![Algea Fish countings](doc/image/balance.png)
 
 ```
-The fish move can swim, reproduce and eat algea. They stop eating the algea when they are full. Algea can expand it's population and appear randomly by chance.
+The fish move can swim, reproduce and eat algea. They stop eating the algea when they are full. Algea can expand it's population by appearing randomly by chance. Big fish are added which eat the smaller fish. Both fish have the ability to grow as they get older.
 ```
 
 ## How to run
@@ -25,21 +25,18 @@ $ python3 fish.py
     - [x] add age component
 
 - algea
-    - [x] can grow with light.
+    - [x] can grow randomly by chance which is affected by the light strength.
     - [x] number gets reduced by fish that eat algea.
 
 - input
     - [x] light strenght
-    - [x] starting algea density
-    - [x] starting number of fish
 
 - [x] the more fish, the less algea.
 - [x] the less algea the less food for the fish, so no mating.
 
 - optional
-    - [] different male and female fish for mating.
     - [x] different species of fish
-    - [] fish grow when they eat. (trying with mesa visualisation)
+    - [x] fish grow when they age
     - [x] different kinds of fish that only mate with the same species.
 
 - end goal
@@ -58,7 +55,7 @@ $ python3 fish.py
 - random to generate a random number to implement some chances
 - matplotlib
 - copy to copy some grids
-- pandas to transform some data for visualisation
+- pandas to transform some data for visualization
 - mesa 
 - shutil 
 - matplotlib.offsetbox
