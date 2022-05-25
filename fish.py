@@ -13,7 +13,6 @@ from copy import deepcopy
 from mesa import Agent, Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
-from mesa.datacollection import DataCollector
 from PIL import Image
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from pyparsing import counted_array
@@ -35,8 +34,6 @@ class BigFish(Agent):
             self.pos, moore=True, include_center=True
         )
         
-
-    
         "make the fish move to nearby fish"
 
         for i in range(len(possible_steps)):
@@ -53,9 +50,11 @@ class BigFish(Agent):
                 new_position = self.random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
         self.big_energy -= 1
+        self.big_look()
 
 
-        "make the fish eat the other fish"
+    def big_look(self):
+        "make the fish eat all the other fish at the same location"
         self.current_big_fish_count = 0
 
         agents = self.model.grid.get_cell_list_contents([self.pos])
@@ -65,13 +64,14 @@ class BigFish(Agent):
                     agent_fish = agents[option]
                     self.big_eat(agent_fish)
         
-                "make the fish mate with each other"
+                "make the fish mate with each other at the same location"
                 if isinstance(agents[option], BigFish):
                     self.current_big_fish_count += 1
         
         if self.current_big_fish_count > 1 and len(agents) < 5:
             # print(agents)
             if self.big_fish_mating_energy():
+                    self.big_mating()
                     self.big_mating()
         
         self.big_mating_counter +=1
@@ -133,7 +133,7 @@ class BigFish(Agent):
             bigfish = BigFish(self.model.next_id(), self.model)
             self.model.schedule.add(bigfish)
             self.model.grid.place_agent(bigfish, self.pos)
-            self.big_energy -= 10
+            self.big_energy -= 20
             self.big_mating_counter = 0
 
 
@@ -171,27 +171,27 @@ class Fish(Agent):
                 new_position = self.random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
         self.energy -= 1
+        self.look()
 
 
+    def look(self):
         "make the fish eat all the algea at the same location"
         self.current_fish_count = 0
         agents = self.model.grid.get_cell_list_contents([self.pos])
-        # print('lengte',len(agents))
         if len(agents)> 1:
             for option in range(len(agents)):
                 if isinstance(agents[option], Algea):
                     agent_algea = agents[option]
-                    # print(agents)
                     if self.energy < 300:
                         self.eat(agent_algea)
 
-                "make the fish mate with each other"
+                "make the fish mate with each other at the same location"
                 if isinstance(agents[option], Fish):
                     self.current_fish_count += 1
         
         if self.current_fish_count > 1:
-            print(agents)
-            print('yes')
+            # print(agents)
+            # print('yes')
             if self.fish_mating_energy():
                     self.mating()
         
@@ -277,7 +277,7 @@ class Algea(Agent):
     def step(self):
         random_growth = self.random.randint(0, 100)
 
-        if random_growth < 4 * self.model.light_strength:
+        if random_growth < 3 * self.model.light_strength:
             self.random_grow()
 
 
@@ -327,15 +327,10 @@ class Fishtank(Model):
             self.grid.place_agent(c, (x, y))
 
 
-        # self.datacollector = DataCollector(model_reporters={"Grid": self.status})
-
     def step(self):
-        # self.datacollector.collect(self)
         self.schedule.step()
     
     def status(self):
-        # fish = Image.open("fish.jpeg")
-
         self.fish_counter = 0
         self.algea_counter = 0
         self.big_fish_counter = 0
@@ -379,6 +374,7 @@ class Fishtank(Model):
 
         
 def agent_portrayal(agent):
+    # add age and color change
     portrayal = {"Shape": "circle",
                  "Filled": "true"}
 
@@ -400,10 +396,10 @@ def agent_portrayal(agent):
 
 if __name__ == "__main__":
     probability_algea = 0.3
-    height = 10
-    width = 20
-    number_fish = 10
-    number_big_fish = 3
+    height = 20
+    width = 30
+    number_fish = 20
+    number_big_fish = 4
 
     # light_strength = int(input('lightstrength in %: '))
     light_strength = 50
@@ -439,8 +435,6 @@ if __name__ == "__main__":
     fish = []
     big_fish = []
 
-    # # data = tank.datacollector.get_model_vars_dataframe()
-    # # print(data)
     im = ax.imshow(tank.status(), cmap=cmap)
     ims.append([im])
 
@@ -448,7 +442,7 @@ if __name__ == "__main__":
     counter_list = []
     counter = 0
 
-    for i in range(100):
+    for i in range(200):
     # while tank.no_fish():
     # #     print(i)
         counter +=1
@@ -458,26 +452,8 @@ if __name__ == "__main__":
         fish.append(tank.fish_counting())
         big_fish.append(tank.big_fish_counting())
 
-    #     # data = tank.datacollector.get_model_vars_dataframe()
-    #     # print(data)
-
         im = ax.imshow(tank.status(), cmap = cmap)
         ims.append([im])
-
-        
-    #     plt.subplot(211)
-    #     plt.imshow(tank.status(), cmap = cmap)
-    #     plt.subplot(212)
-    #     plt.plot(counter_list, fish, label = 'fish')
-    #     plt.plot(counter_list, algea, label = 'algea')
-    #     plt.xlabel('swims')
-    #     plt.ylabel('fish')
-        
-    #     plt.savefig('fig.png')
-    #     im =  Image.open("fig.png")
-    #     print(im)
-    #     ims.append(im) 
-    #     print(ims)   
     
         tank.step()
         

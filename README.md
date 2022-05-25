@@ -21,7 +21,7 @@ $ python3 fish.py
     - [x] energy can be obtained by eating algea.
     - [x] with energy fish can mate and bare children.
     - [x] fish die when no more energy
-    - [x] add age
+    - [x] add age component
 
 - algea
     - [x] can grow with light.
@@ -32,13 +32,13 @@ $ python3 fish.py
     - [x] starting algea density
     - [x] starting number of fish
 
-- [x] the more fish, the less light, the less algea.
+- [x] the more fish, the less algea.
 - [x] the less algea the less food for the fish, so no mating.
 
 - optional
     - [] different male and female fish for mating.
     - [x] different species of fish
-    - [] fish grow when they eat.
+    - [] fish grow when they eat. (trying with mesa visualisation)
     - [x] different kinds of fish that only mate with the same species.
 
 - end goal
