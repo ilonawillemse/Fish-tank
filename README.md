@@ -28,7 +28,7 @@ $ python3 fish.py
     - [x] number gets reduced by fish that eat algea.
 
 - input
-    - [] light strenght
+    - [x] light strenght
     - [x] starting algea density
     - [x] starting number of fish
 
@@ -37,12 +37,12 @@ $ python3 fish.py
 
 - optional
     - [] different male and female fish for mating.
-    - [] different species of fish
+    - [x] different species of fish
     - [] fish grow when they eat.
-    - [] different kinds of fish that only mate with the same species.
+    - [x] different kinds of fish that only mate with the same species.
 
 - end goal
-    - [] visualise how fish populations are influenced by light strength
+    - [x] visualise how fish populations are influenced by light strength
 
 - addition
     - [] try visualising the animated plot at the same time as the animation, that would be super cool

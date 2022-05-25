@@ -47,6 +47,8 @@ monday:
 
 tuesday:
 - fish have an age now
-- change visualisation to mesa advanced
+- started changing visualisation to mesa advanced
+- change current agent aquirement to 'self' instead of doing it the hard way
 
-- change agent to self...............
+wednesday:
+- fixed some bugs, like having to much agents at a grid point and not only looking whether the first 2 agents are fish to mate

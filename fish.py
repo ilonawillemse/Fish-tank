@@ -23,13 +23,13 @@ class BigFish(Agent):
 
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.energy = 200
-        self.age = 0
+        self.big_energy = 200
+        self.big_age = 0
         self.type = 'bigfish'
-        self.mating_counter = 0
+        self.big_mating_counter = 0
 
     
-    def move(self): 
+    def big_move(self): 
         "decide on neighbour positions"
         possible_steps = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=True
@@ -52,39 +52,40 @@ class BigFish(Agent):
             else:
                 new_position = self.random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
-        self.energy -= 1
+        self.big_energy -= 1
 
 
         "make the fish eat the other fish"
+        self.current_big_fish_count = 0
 
         agents = self.model.grid.get_cell_list_contents([self.pos])
         if len(agents)> 1:
             for option in range(len(agents)):
                 if isinstance(agents[option], Fish):
                     agent_fish = agents[option]
-                    self.eat(agent_fish)
+                    self.big_eat(agent_fish)
         
-
-        "make the fish mate with each other"
-
-        if len(agents)> 1:
-            if isinstance(agents[0], BigFish) and isinstance(agents[1], BigFish):
-                if self.fish_mating_energy():
-                    self.mating()
+                "make the fish mate with each other"
+                if isinstance(agents[option], BigFish):
+                    self.current_big_fish_count += 1
         
-        self.age +=1
-        self.mating_counter +=1
-
+        if self.current_big_fish_count > 1 and len(agents) < 5:
+            # print(agents)
+            if self.big_fish_mating_energy():
+                    self.big_mating()
+        
+        self.big_mating_counter +=1
+        self.big_age +=1
 
     
-    def eat(self, fish): 
+    def big_eat(self, fish): 
         "the fish eats algea"
         self.model.grid.remove_agent(fish)
         self.model.schedule.remove(fish)
-        self.energy += 200
+        self.big_energy += 200
     
 
-    def move_up(self):        
+    def big_move_up(self):        
         "when the fish dies it moves to the top of the tank"
 
         new = self.pos[1] - 2
@@ -94,10 +95,10 @@ class BigFish(Agent):
             self.model.grid.move_agent(self, new_pos)
         
         else:
-            self.die()
+            self.big_die()
         
 
-    def die(self):
+    def big_die(self):
         "the fish dies / dissapears"
         self.model.grid.remove_agent(self)
         self.model.schedule.remove(self)
@@ -106,34 +107,34 @@ class BigFish(Agent):
     def step(self):
         "the fish moves when it still has enegery, otherwise dies"
 
-        if self.fish_energy() and self.age < 50:
-            self.move()
+        if self.big_fish_energy() and self.big_age < 50:
+            self.big_move()
 
         else:
-            self.move_up()
+            self.big_move_up()
 
 
-    def fish_energy(self):
+    def big_fish_energy(self):
         "tells whether the fish still got some energy"
 
-        if self.energy > 0:
+        if self.big_energy > 0:
             return True
 
 
-    def fish_mating_energy(self):
+    def big_fish_mating_energy(self):
         "tells whether the fish has enough mating energy"
-        if self.energy > 80:
+        if self.big_energy > 80:
             return True
         
 
-    def mating(self):
+    def big_mating(self):
         "fish make a baby but loose some energy"
-        if self.mating_counter > 6:
+        if self.big_mating_counter > 6:
             bigfish = BigFish(self.model.next_id(), self.model)
             self.model.schedule.add(bigfish)
             self.model.grid.place_agent(bigfish, self.pos)
-            self.energy -= 10
-            self.mating_counter = 0
+            self.big_energy -= 10
+            self.big_mating_counter = 0
 
 
 
@@ -172,9 +173,10 @@ class Fish(Agent):
         self.energy -= 1
 
 
-        "make the fish eat the algea"
-
+        "make the fish eat all the algea at the same location"
+        self.current_fish_count = 0
         agents = self.model.grid.get_cell_list_contents([self.pos])
+        # print('lengte',len(agents))
         if len(agents)> 1:
             for option in range(len(agents)):
                 if isinstance(agents[option], Algea):
@@ -182,15 +184,15 @@ class Fish(Agent):
                     # print(agents)
                     if self.energy < 300:
                         self.eat(agent_algea)
-                    # print('na', agents)
+
+                "make the fish mate with each other"
+                if isinstance(agents[option], Fish):
+                    self.current_fish_count += 1
         
-
-        "make the fish mate with each other"
-
-        if len(agents)> 1:
-            # print(agents)
-            if isinstance(agents[0], Fish) and isinstance(agents[1], Fish):
-                if self.fish_mating_energy():
+        if self.current_fish_count > 1:
+            print(agents)
+            print('yes')
+            if self.fish_mating_energy():
                     self.mating()
         
         self.mating_counter +=1
@@ -398,10 +400,10 @@ def agent_portrayal(agent):
 
 if __name__ == "__main__":
     probability_algea = 0.3
-    height = 20
-    width = 40
-    number_fish = 20
-    number_big_fish = 10
+    height = 10
+    width = 20
+    number_fish = 10
+    number_big_fish = 3
 
     # light_strength = int(input('lightstrength in %: '))
     light_strength = 50
@@ -446,7 +448,7 @@ if __name__ == "__main__":
     counter_list = []
     counter = 0
 
-    for i in range(700):
+    for i in range(100):
     # while tank.no_fish():
     # #     print(i)
         counter +=1
@@ -480,14 +482,14 @@ if __name__ == "__main__":
         tank.step()
         
     # # save the animation of the fishtank
-    # ani = animation.ArtistAnimation(fig, ims, interval = 200, blit = True, repeat_delay= 1000)
+    ani = animation.ArtistAnimation(fig, ims, interval = 400, blit = True, repeat_delay= 1000)
 
     # plt.xticks(size = 0)
     # plt.yticks(size = 0)
     # plt.xlabel('width')
     # plt.ylabel('height')
 
-    # ani.save("fish.gif")
+    ani.save("fish.gif")
 
     print(algea)
     print(fish)
