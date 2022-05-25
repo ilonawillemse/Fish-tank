@@ -1,8 +1,7 @@
 # project-ilona willemse fishtank
 This code creates a situation that visualises a fishtank within an animation.
 
-![Fish visualisation](doc/image/prototype.png)
-![Algea Fish countings](doc/image/example_AlgeaFish.png)
+![Fish visualisation](doc/image/fishtank.png)
 ![Algea Fish countings](doc/image/balance.png)
 
 ```
