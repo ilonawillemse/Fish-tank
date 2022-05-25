@@ -16,6 +16,10 @@ from mesa.space import MultiGrid
 from PIL import Image
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from pyparsing import counted_array
+from mesa.visualization.modules import CanvasGrid
+from mesa.visualization.ModularVisualization import ModularServer
+from mesa.visualization.modules import ChartModule
+from mesa.datacollection import DataCollector
 
 class BigFish(Agent):
     "class Fish makes an agent of the fish"
@@ -88,10 +92,10 @@ class BigFish(Agent):
     def big_move_up(self):        
         "when the fish dies it moves to the top of the tank"
 
-        new = self.pos[1] - 2
+        new = self.pos[1] + 1
         new_pos = (self.pos[0], new)
 
-        if new >= 0:
+        if new < self.model.height:
             self.model.grid.move_agent(self, new_pos)
         
         else:
@@ -209,10 +213,11 @@ class Fish(Agent):
     def move_up(self):        
         "when the fish dies it moves to the top of the tank"
 
-        new = self.pos[1] - 2
+        new = self.pos[1] + 1
         new_pos = (self.pos[0], new)
+        print(new_pos)
 
-        if new >= 0:
+        if new < self.model.height:
             self.model.grid.move_agent(self, new_pos)
         
         else:
@@ -277,7 +282,7 @@ class Algea(Agent):
     def step(self):
         random_growth = self.random.randint(0, 100)
 
-        if random_growth < 3 * self.model.light_strength:
+        if random_growth < 5 * self.model.light_strength:
             self.random_grow()
 
 
@@ -296,6 +301,11 @@ class Fishtank(Model):
         self.grid = MultiGrid(width, height, False)
         self.visgrid = np.zeros((height,width))
         self.schedule = RandomActivation(self)
+
+        self.datacollector = DataCollector(
+            model_reporters={   "fish": self.fish, 
+                                "bigfish": self.bigfish,
+                                "algea": self.algea})
         
 
         # create agents
@@ -328,31 +338,8 @@ class Fishtank(Model):
 
 
     def step(self):
-        self.schedule.step()
-    
-    def status(self):
-        self.fish_counter = 0
-        self.algea_counter = 0
-        self.big_fish_counter = 0
-
-        for i in range(self.height):
-            for j in range(self.width):
-                if len(self.grid[j][i]) > 0:
-                    for something in range(len(self.grid[j][i])):
-                        if isinstance(self.grid[j][i][something], Algea):
-                            self.visgrid[i][j] = 1
-                            self.algea_counter += 1
-                        if isinstance(self.grid[j][i][something], Fish):
-                            self.visgrid[i][j] = 2
-                            self.fish_counter += 1
-                        if isinstance(self.grid[j][i][something], BigFish):
-                            self.visgrid[i][j] = 3
-                            self.big_fish_counter += 1
-                    
-                else:
-                    self.visgrid[i][j] = 0
-
-        return self.visgrid 
+        self.datacollector.collect(self)
+        self.schedule.step()  
     
     def big_fish_counting(self):
         return self.big_fish_counter
@@ -370,26 +357,73 @@ class Fishtank(Model):
                 if self.visgrid[i][j] == 2:
                     return True
         return False
+
+    def fish(self):
+        fish_counter = 0
+
+        for i in range(self.height):
+            for j in range(self.width):
+                if len(self.grid[j][i]) > 0:
+                    for something in range(len(self.grid[j][i])):
+                        if isinstance(self.grid[j][i][something], Fish):
+                            fish_counter += 1
+        return fish_counter
     
+    def bigfish(self):
+        big_fish_counter = 0
+
+        for i in range(self.height):
+            for j in range(self.width):
+                if len(self.grid[j][i]) > 0:
+                    for something in range(len(self.grid[j][i])):
+                        if isinstance(self.grid[j][i][something], BigFish):
+                            big_fish_counter += 1
+        return big_fish_counter
+
+    def algea(self):
+        algea_counter = 0
+
+        for i in range(self.height):
+            for j in range(self.width):
+                if len(self.grid[j][i]) > 0:
+                    for something in range(len(self.grid[j][i])):
+                        if isinstance(self.grid[j][i][something], Algea):
+                            algea_counter += 1
+        return (algea_counter/ (self.width * self.height))
+                
 
         
 def agent_portrayal(agent):
     # add age and color change
-    portrayal = {"Shape": "circle",
-                 "Filled": "true"}
-
-    if agent.type == 'fish':
-        portrayal["Color"] = "red"
-        portrayal["Layer"] = 2
+    portrayal = {"Filled": "true"}
+    
     if agent.type == 'algea':
         portrayal["Color"] = "green"
         portrayal["Layer"] = 1
-        portrayal["r"] = 1
-        portrayal["Shape"]= "circle"
+        portrayal["Shape"] = "rect"
+        portrayal["h"] = 1
+        portrayal["w"] = 1
+
+    
+    elif agent.type == 'fish':
+        portrayal["Color"] = "orange"
+        portrayal["Layer"] = 2
+        portrayal["r"] = 0.5
+        portrayal["Shape"] = "circle"
+
+    
+    elif agent.type == 'bigfish':
+        portrayal["Color"] = "red"
+        portrayal["Layer"] = 2       
+        portrayal["r"] = 0.9 
+        portrayal["Shape"] = "circle"
+
     else:
         portrayal["Color"] = "blue"
         portrayal["Layer"] = 0
         portrayal["r"] = 1
+        portrayal["Shape"] = "circle"
+
 
     return portrayal
         
@@ -406,84 +440,20 @@ if __name__ == "__main__":
 
 
 
-    # grid = CanvasGrid(agent_portrayal, 40, 20, 500, 500)
+    grid = CanvasGrid(agent_portrayal, 20, 20, 500, 300)
 
-    # # chart = ChartModule([{"Label": "Fish",
-    # #                     "Color": "Black"}],
-    # #                     data_collector_name='datacollector')
-
-    # server = ModularServer(Fishtank,
-    #                     [grid],
-    #                     "Fishtank",
-    #                     {"width":40, "height": 20, "probability_algea": 0.3, "number_fish": 10, "light_strength": light_strength, "number_big_fish": 10})
-    # server.port = 8521 # The default
-
-
-    # server.launch()
-
+    chart = ChartModule([{"Label": "fish", "Color": "Orange"}, 
+                        {"Label": "bigfish", "Color": "Red"}], 
+                        data_collector_name='datacollector')
     
+    chart2 = ChartModule([{"Label": "algea", "Color": "Green"}], 
+                        data_collector_name='datacollector')
 
-    # create a forest object
-    tank = Fishtank(width, height, probability_algea, number_fish, light_strength, number_big_fish)
-
-    # # creating the animation
-    fig, ax = plt.subplots()
-    cmap = colors.ListedColormap(['blue', 'green', 'orange', 'red'])
-   
-    ims = []
-    algea = []
-    fish = []
-    big_fish = []
-
-    im = ax.imshow(tank.status(), cmap=cmap)
-    ims.append([im])
+    server = ModularServer(Fishtank,
+                        [grid,chart2,chart],
+                        "Fishtank Ilona Willemse",
+                        {"width":20, "height": 20, "probability_algea": 0.3, "number_fish": 30, "light_strength": light_strength, "number_big_fish": 5})
+    server.port = 8521 # The default
 
 
-    counter_list = []
-    counter = 0
-
-    for i in range(200):
-    # while tank.no_fish():
-    # #     print(i)
-        counter +=1
-        print(counter)
-        counter_list.append(counter)
-        algea.append(tank.algea_counting())
-        fish.append(tank.fish_counting())
-        big_fish.append(tank.big_fish_counting())
-
-        im = ax.imshow(tank.status(), cmap = cmap)
-        ims.append([im])
-    
-        tank.step()
-        
-    # # save the animation of the fishtank
-    ani = animation.ArtistAnimation(fig, ims, interval = 400, blit = True, repeat_delay= 1000)
-
-    # plt.xticks(size = 0)
-    # plt.yticks(size = 0)
-    # plt.xlabel('width')
-    # plt.ylabel('height')
-
-    ani.save("fish.gif")
-
-    print(algea)
-    print(fish)
-    print(big_fish)
-
-
-    plt.subplot(211)
-    plt.plot(counter_list, np.array(algea)/(width * height), label = 'algea')
-    plt.ylabel('algea')
-
-    plt.subplot(212)
-    plt.plot(counter_list, fish, label = 'fish')
-    plt.xlabel('swims')
-    plt.ylabel('fish')
-
-    plt.subplot(212)
-    plt.plot(counter_list, big_fish, label = 'big_fish')
-    # plt.ylabel('big_fish')
-    plt.legend()
-    
-    plt.savefig('fig.png')
+    server.launch()

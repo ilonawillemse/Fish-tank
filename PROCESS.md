@@ -52,3 +52,4 @@ tuesday:
 
 wednesday:
 - fixed some bugs, like having to much agents at a grid point and not only looking whether the first 2 agents are fish to mate
+- continued on visualizing the animation with mesa and adding some charts with the fish and algea countings
