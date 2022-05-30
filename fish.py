@@ -16,6 +16,7 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
 from mesa.datacollection import DataCollector
+from mesa.visualization.ModularVisualization import VisualizationElement
 
 class BigFish(Agent):
     "class BigFish makes an agent of the big fish"
@@ -49,7 +50,7 @@ class BigFish(Agent):
             else:
                 new_position = self.random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
-        self.big_energy -= 5
+        self.big_energy -= 10
         self.big_look()
 
 
@@ -121,7 +122,7 @@ class BigFish(Agent):
 
     def big_fish_mating_energy(self):
         "tells whether the big fish has enough mating energy"
-        if self.big_energy > 80:
+        if self.big_energy > 100:
             return True
         
 
@@ -133,7 +134,7 @@ class BigFish(Agent):
                 self.model.schedule.add(bigfish)
                 self.model.grid.place_agent(bigfish, self.pos)
             
-            self.big_energy -= 30
+            self.big_energy -= 80
             self.big_mating_counter = 0
 
 
@@ -294,6 +295,9 @@ class Fishtank(Model):
         self.number_fish = number_fish
         self.number_big_fish = number_big_fish
         self.light_strength = light_strength / 50
+        self.fish_counter = 0
+        self.big_fish_counter = 0
+        self.algea_counter = 0
         
         self.grid = MultiGrid(width, height, False)
         self.visgrid = np.zeros((height,width))
@@ -335,78 +339,63 @@ class Fishtank(Model):
 
 
     def step(self):
+        self.fishcounting()
         self.datacollector.collect(self)
         self.schedule.step()  
     
-
-    def fish(self):
-        fish_counter = 0
+    def fishcounting(self):
+        self.fish_counter = 0
+        self.big_fish_counter = 0
+        self.algea_counter = 0
 
         for i in range(self.height):
             for j in range(self.width):
                 if len(self.grid[j][i]) > 0:
                     for something in range(len(self.grid[j][i])):
                         if isinstance(self.grid[j][i][something], Fish):
-                            fish_counter += 1
-        return fish_counter
+                            self.fish_counter += 1
+                    for something in range(len(self.grid[j][i])):
+                        if isinstance(self.grid[j][i][something], BigFish):
+                            self.big_fish_counter += 1
+                        if isinstance(self.grid[j][i][something], Algea):
+                            self.algea_counter += 1
+
+
+    def fish(self):
+        return self.fish_counter
     
 
     def bigfish(self):
-        big_fish_counter = 0
-
-        for i in range(self.height):
-            for j in range(self.width):
-                if len(self.grid[j][i]) > 0:
-                    for something in range(len(self.grid[j][i])):
-                        if isinstance(self.grid[j][i][something], BigFish):
-                            big_fish_counter += 1
-        return big_fish_counter
+        return self.big_fish_counter
 
 
     def algea(self):
-        algea_counter = 0
-
-        for i in range(self.height):
-            for j in range(self.width):
-                if len(self.grid[j][i]) > 0:
-                    for something in range(len(self.grid[j][i])):
-                        if isinstance(self.grid[j][i][something], Algea):
-                            algea_counter += 1
-        return (algea_counter/ (self.width * self.height))
+        return (self.algea_counter/ (self.width * self.height))
                 
 
         
 def agent_portrayal(agent):
     "give proporties to the agents for visualization"
 
-    portrayal = {"Filled": "true"}
+    portrayal = {"Filled": "true", "x": 1, "y": 1}
+
     if agent.type == 'fish':
         portrayal["Layer"] = 2
 
         if agent.energy == 0:
             portrayal["Shape"] = "doc/image/deadfish.png"
-            portrayal["x"] = 1
-            portrayal["y"] = 1
             portrayal["scale"] = 0.8
         
         else:
+            portrayal["Shape"] = "doc/image/fish.png"
             if agent.age < 10:
-                portrayal["Shape"] = "doc/image/fish.png"
-                portrayal["x"] = 1
-                portrayal["y"] = 1
                 portrayal["scale"] = 0.3 
 
             elif agent.age < 30:
-                portrayal["Shape"] = "doc/image/fish.png"
-                portrayal["x"] = 1
-                portrayal["y"] = 1
                 portrayal["scale"] = 0.5
                 portrayal["Layer"] = 3
 
             else:
-                portrayal["Shape"] = "doc/image/fish.png"
-                portrayal["x"] = 1
-                portrayal["y"] = 1
                 portrayal["scale"] = 0.8
                 portrayal["Layer"] = 4
 
@@ -416,44 +405,61 @@ def agent_portrayal(agent):
 
         if agent.big_energy == 0:
             portrayal["Shape"] = "doc/image/deadshark.png"
-            portrayal["x"] = 1
-            portrayal["y"] = 1
             portrayal["scale"] = 1    
         else:
-            if agent.big_age < 10:      
-                portrayal["Shape"] = "doc/image/shark.jpg"
-                portrayal["x"] = 1
-                portrayal["y"] = 1
+            portrayal["Shape"] = "doc/image/shark.jpg"
+            if agent.big_age < 10:    
                 portrayal["scale"] = 0.5
 
-            if agent.big_age < 30:      
-                portrayal["Shape"] = "doc/image/shark.jpg"
-                portrayal["x"] = 1
-                portrayal["y"] = 1
+            elif agent.big_age < 30:      
                 portrayal["scale"] = 0.8
                 portrayal["Layer"] = 6
 
-
             else:
-                portrayal["Shape"] = "doc/image/shark.jpg"
-                portrayal["x"] = 1
-                portrayal["y"] = 1
                 portrayal["scale"] = 1
                 portrayal["Layer"] = 7
 
 
     elif agent.type == 'algea':
         portrayal["Layer"] = 1
-
         portrayal["Shape"] = "doc/image/algea.jpg"
-        portrayal["x"] = 1
-        portrayal["y"] = 1
         portrayal["scale"] = 1
 
     return portrayal
         
 
 if __name__ == "__main__":
+    # visualisation of number of Fish depending on light strength
+    # fish = {}
+    # bigfish = {}
+    # for light in np.arange(0, 105, 5):
+    #     fish_list = []
+    #     bigfish_list = []
+
+    #     tank = Fishtank(20, 20, 0.3, 30, light, 6)
+
+    #     for _ in range(600):
+    #         fish_list.append(tank.fish_counter)
+    #         mean_fish = sum(fish_list) / len(fish_list)
+
+    #         bigfish_list.append(tank.big_fish_counter)
+    #         mean_bigfish = sum(bigfish_list) / len(bigfish_list)
+            
+    #         tank.step()
+        
+    #     fish[light] = mean_fish
+    #     bigfish[light] = mean_bigfish
+    
+    # plt.plot(fish.keys(),fish.values())
+    # plt.plot(bigfish.keys(), bigfish.values())
+    # plt.legend(['fish', 'bigfish'])
+    # plt.title('Sensitivity of fish population depending on light strenght')
+    # plt.xlabel('Light strength')
+    # plt.ylabel('Fish numbers')
+    # plt.savefig('fishies.png')
+
+
+    # live visualisation of the fishtank with certain lightstrenght
     "ask light strenght input from user to decide how fast the algea grow"
     light_strength = int(input('lightstrength in %: '))
 
@@ -466,7 +472,7 @@ if __name__ == "__main__":
     
     chart2 = ChartModule([{"Label": "algea", "Color": "Green"}], 
                         data_collector_name='datacollector')
-
+    
     server = ModularServer(Fishtank,
                         [grid,chart2,chart],
                         "Fishtank Ilona Willemse",
