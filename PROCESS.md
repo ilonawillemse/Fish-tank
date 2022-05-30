@@ -19,14 +19,12 @@ wednesday:
 - make the algea able to grow, both spread like a fungi as grow randomly because of the light
 - looked into inserting a picture of a fish inside the grid
 
-
 thursday:
 - made an option so that the fish can get saturated
 - algea will grow by chance
 - continued looking into the insertion of a fish picture inside the grid
 - fish can mate
 - fish can die
-
 
 friday:
 - fish now will float when they die and then disappear.
@@ -58,4 +56,5 @@ wednesday:
 
 week 3:
 Monday:
-- made visualisation of fish populations when light strenght gets influenced
+- made visualisation of fish populations when light strength gets influenced
+- removed excessive lines of code by implementing another method which returns just a value
