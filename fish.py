@@ -16,7 +16,6 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
 from mesa.datacollection import DataCollector
-from mesa.visualization.ModularVisualization import VisualizationElement
 
 class BigFish(Agent):
     "class BigFish makes an agent of the big fish"
@@ -337,7 +336,6 @@ class Fishtank(Model):
             y = self.random.randrange(self.height)
             self.grid.place_agent(c, (x, y))
 
-
     def step(self):
         self.fishcounting()
         self.datacollector.collect(self)
@@ -363,11 +361,9 @@ class Fishtank(Model):
 
     def fish(self):
         return self.fish_counter
-    
 
     def bigfish(self):
         return self.big_fish_counter
-
 
     def algea(self):
         return (self.algea_counter/ (self.width * self.height))
@@ -388,6 +384,7 @@ def agent_portrayal(agent):
         
         else:
             portrayal["Shape"] = "doc/image/fish.png"
+           
             if agent.age < 10:
                 portrayal["scale"] = 0.3 
 
@@ -406,8 +403,10 @@ def agent_portrayal(agent):
         if agent.big_energy == 0:
             portrayal["Shape"] = "doc/image/deadshark.png"
             portrayal["scale"] = 1    
+        
         else:
             portrayal["Shape"] = "doc/image/shark.jpg"
+           
             if agent.big_age < 10:    
                 portrayal["scale"] = 0.5
 
@@ -421,9 +420,9 @@ def agent_portrayal(agent):
 
 
     elif agent.type == 'algea':
-        portrayal["Layer"] = 1
         portrayal["Shape"] = "doc/image/algea.jpg"
         portrayal["scale"] = 1
+        portrayal["Layer"] = 1
 
     return portrayal
         
