@@ -32,7 +32,7 @@ class BigFish(Agent):
 
 
     def big_move(self): 
-        "decide on neighbour positions"
+        "move to a new spot in the fishtank"
         possible_steps = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=True
         )
@@ -57,9 +57,10 @@ class BigFish(Agent):
 
 
     def big_look(self):
-        "make the big fish eat all the other smaller fish at the same location"
+        "look at the spot to see whether to eat, mate or do nothing"
         self.current_big_fish_count = 0
 
+        "make the big fish eat smaller fish"
         agents = self.model.grid.get_cell_list_contents([self.pos])
         if len(agents)> 1:
             for option in range(len(agents)):
@@ -89,7 +90,6 @@ class BigFish(Agent):
 
     def big_move_up(self):        
         "when the big fish dies it moves to the top of the tank"
-
         new = self.pos[1] + 1
         new_pos = (self.pos[0], new)
 
@@ -108,8 +108,7 @@ class BigFish(Agent):
 
     def step(self):
         "the big fish moves when it still has enegery, otherwise dies"
-
-        if self.big_fish_energy() and self.big_age < 80:
+        if self.big_fish_energy() and self.big_age < 100:
             self.big_move()
 
         else:
@@ -118,7 +117,6 @@ class BigFish(Agent):
 
     def big_fish_energy(self):
         "tells whether the big fish still got some energy"
-
         if self.big_energy > 0:
             return True
 
@@ -131,7 +129,7 @@ class BigFish(Agent):
 
     def big_mating(self):
         "bigfish makes a baby but looses some energy"
-        if self.big_mating_counter > 20:
+        if self.big_mating_counter > 30:
             current = self.model.grid.get_cell_list_contents([self.pos])
             if len(current) < 4:
                 bigfish = BigFish(self.model.next_id(), self.model)
@@ -153,7 +151,7 @@ class Fish(Agent):
     
 
     def move(self): 
-        "decide on neighbour positions"
+        "move to a new spot in the fishtank"
         possible_steps = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=True
         )
@@ -177,8 +175,10 @@ class Fish(Agent):
 
 
     def look(self):
-        "make the fish eat all the algea at the same location"
+        "make the fish look at the spot they are at whether to eat, mate or do nothing"
         self.current_fish_count = 0
+
+        "make the fish eat algea"
         agents = self.model.grid.get_cell_list_contents([self.pos])
         if len(agents)> 1:
             for option in range(len(agents)):
@@ -187,7 +187,7 @@ class Fish(Agent):
                     if self.energy < 200:
                         self.eat(agent_algea)
 
-                "make the fish mate with each other at the same location"
+                "make the fish mate with each other"
                 if isinstance(agents[option], Fish):
                     self.current_fish_count += 1
         
@@ -229,7 +229,6 @@ class Fish(Agent):
 
     def move_up(self):        
         "when the fish dies it moves to the top of the tank"
-
         new = self.pos[1] + 1
         new_pos = (self.pos[0], new)
 
@@ -259,7 +258,7 @@ class Fish(Agent):
 
 
 class Algea(Agent):
-    "class Algea makes an agent of the algea"
+    "Create Algea agents"
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.type = 'algea'
@@ -267,7 +266,6 @@ class Algea(Agent):
 
     def random_grow(self): 
         "makes the algea grow at random locations as long as that gridpoint is empty"
-       
         x = self.random.randrange(self.model.width)
         y = self.random.randrange(self.model.height)
         
@@ -279,10 +277,9 @@ class Algea(Agent):
 
     def step(self):
         "with chance the algea can grow in time"
-
         random_growth = self.random.randint(0, 100)
 
-        if random_growth < 50 * self.model.light_strength:
+        if random_growth < 10 * self.model.light_strength:
             self.random_grow()
 
 
