@@ -49,16 +49,15 @@ $ python3 fish.py
 
 ## libraries
 ```
-- numpy
-- matplotlib.pyplot to plot the data in an image
-- matplotlib.animation to visualize the animation
-- random to generate a random number to implement some chances
-- matplotlib
-- copy to copy some grids
-- pandas to transform some data for visualization
-- mesa 
-- shutil 
-- matplotlib.offsetbox
+import numpy as np
+import matplotlib.pyplot as plt
+from mesa import Agent, Model
+from mesa.time import RandomActivation
+from mesa.space import MultiGrid
+from mesa.visualization.modules import CanvasGrid
+from mesa.visualization.ModularVisualization import ModularServer
+from mesa.visualization.modules import ChartModule
+from mesa.datacollection import DataCollector
 ```
 
 ## limitations that could come up

@@ -55,3 +55,7 @@ wednesday:
 - continued on visualizing the animation with mesa and adding some charts with the fish and algea countings
 - added pictures of algea and fish to the animation
 
+
+week 3:
+Monday:
+- made visualisation of fish populations when light strenght gets influenced

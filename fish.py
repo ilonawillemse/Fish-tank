@@ -1,33 +1,32 @@
 """
 =================================================
-Animated image using a precomputed list of images
+Imitation of a fishtank with growing algea and two populations of fish.
+Live visualisation of the fish and algea population growth.
+Visualisation of fish population changes when light strength influences.
 =================================================
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import random
-from matplotlib import colors
 from mesa import Agent, Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
-from PIL import Image
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
 from mesa.datacollection import DataCollector
 
+
 class BigFish(Agent):
-    "class BigFish makes an agent of the big fish"
+    "Creating BigFish agents"
 
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.big_energy = 200
+        self.big_energy = 400
         self.big_age = 0
         self.type = 'bigfish'
         self.big_mating_counter = 0
 
-    
     def big_move(self): 
         "decide on neighbour positions"
         possible_steps = self.model.grid.get_neighborhood(
@@ -52,7 +51,6 @@ class BigFish(Agent):
         self.big_energy -= 10
         self.big_look()
 
-
     def big_look(self):
         "make the big fish eat all the other smaller fish at the same location"
         self.current_big_fish_count = 0
@@ -62,7 +60,8 @@ class BigFish(Agent):
             for option in range(len(agents)):
                 if isinstance(agents[option], Fish):
                     agent_fish = agents[option]
-                    self.big_eat(agent_fish)
+                    if self.big_energy < 200:
+                        self.big_eat(agent_fish)
         
                 "make the big fish mate with each other at the same location"
                 if isinstance(agents[option], BigFish):
@@ -75,14 +74,12 @@ class BigFish(Agent):
         self.big_mating_counter +=1
         self.big_age +=1
 
-    
     def big_eat(self, fish): 
         "the big fish eats other smaller fish"
         self.model.grid.remove_agent(fish)
         self.model.schedule.remove(fish)
         self.big_energy += 200
     
-
     def big_move_up(self):        
         "when the big fish dies it moves to the top of the tank"
 
@@ -95,22 +92,19 @@ class BigFish(Agent):
         else:
             self.big_die()
         
-
     def big_die(self):
         "the big fish dies / dissapears"
         self.model.grid.remove_agent(self)
         self.model.schedule.remove(self)
-        
-        
+          
     def step(self):
         "the big fish moves when it still has enegery, otherwise dies"
 
-        if self.big_fish_energy() and self.big_age < 50:
+        if self.big_fish_energy() and self.big_age < 100:
             self.big_move()
 
         else:
             self.big_move_up()
-
 
     def big_fish_energy(self):
         "tells whether the big fish still got some energy"
@@ -118,32 +112,31 @@ class BigFish(Agent):
         if self.big_energy > 0:
             return True
 
-
     def big_fish_mating_energy(self):
         "tells whether the big fish has enough mating energy"
-        if self.big_energy > 100:
+        if self.big_energy > 200:
             return True
         
-
     def big_mating(self):
         "bigfish makes a baby but looses some energy"
-        if self.big_mating_counter > 10:
-            for _ in range(2):
+        if self.big_mating_counter > 20:
+            current = self.model.grid.get_cell_list_contents([self.pos])
+            if len(current) < 4:
                 bigfish = BigFish(self.model.next_id(), self.model)
                 self.model.schedule.add(bigfish)
                 self.model.grid.place_agent(bigfish, self.pos)
+                
+                self.big_energy -= 150
+                self.big_mating_counter = 0
             
-            self.big_energy -= 80
-            self.big_mating_counter = 0
-
 
 
 class Fish(Agent):
-    "class Fish makes an agent of the fish"
+    "Creating Fish agents"
 
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.energy = 30
+        self.energy = 40
         self.mating_counter = 0
         self.age = 0
         self.type = 'fish'
@@ -154,9 +147,7 @@ class Fish(Agent):
             self.pos, moore=True, include_center=True
         )
         
-
         "make the fish move to nearby algea"
-
         for i in range(len(possible_steps)):
             the_agents = self.model.grid.get_cell_list_contents([possible_steps[i]])
             if len(the_agents)> 0:
@@ -173,7 +164,6 @@ class Fish(Agent):
         self.energy -= 1
         self.look()
 
-
     def look(self):
         "make the fish eat all the algea at the same location"
         self.current_fish_count = 0
@@ -182,7 +172,7 @@ class Fish(Agent):
             for option in range(len(agents)):
                 if isinstance(agents[option], Algea):
                     agent_algea = agents[option]
-                    if self.energy < 300:
+                    if self.energy < 200:
                         self.eat(agent_algea)
 
                 "make the fish mate with each other at the same location"
@@ -190,20 +180,18 @@ class Fish(Agent):
                     self.current_fish_count += 1
         
         if self.current_fish_count > 1:
-            if self.fish_mating_energy() and self.age > 3:
+            if self.fish_mating_energy() and self.age > 10:
                     self.mating()
         
         self.mating_counter +=1
         self.age +=1
-
     
     def eat(self, algea): 
         "the fish eats algea"
         self.model.grid.remove_agent(algea)
         self.model.schedule.remove(algea)
-        self.energy += 20
+        self.energy += 30
     
-
     def move_up(self):        
         "when the fish dies it moves to the top of the tank"
 
@@ -215,14 +203,12 @@ class Fish(Agent):
         
         else:
             self.die()
-        
 
     def die(self):
         "the fish dies / dissapears"
 
         self.model.grid.remove_agent(self)
         self.model.schedule.remove(self)
-        
         
     def step(self):
         "the fish moves when it still has enegery, otherwise dies"
@@ -233,28 +219,27 @@ class Fish(Agent):
         else:
             self.move_up()
 
-
     def fish_energy(self):
         "tells whether the fish still got some energy"
 
         if self.energy > 0:
             return True
 
-
     def fish_mating_energy(self):
         "tells whether the fish has enough mating energy"
-        if self.energy > 20:
+        if self.energy > 30:
             return True
         
-
     def mating(self):
         "fish make a baby but loose some energy"
         if self.mating_counter > 12:
-            fish = Fish(self.model.next_id(), self.model)
-            self.model.schedule.add(fish)
-            self.model.grid.place_agent(fish, self.pos)
-            self.energy -= 15
-            self.mating_counter = 0
+            current = self.model.grid.get_cell_list_contents([self.pos])
+            if len(current) < 3:
+                fish = Fish(self.model.next_id(), self.model)
+                self.model.schedule.add(fish)
+                self.model.grid.place_agent(fish, self.pos)
+                self.energy -= 15
+                self.mating_counter = 0
 
 
 class Algea(Agent):
@@ -279,12 +264,12 @@ class Algea(Agent):
 
         random_growth = self.random.randint(0, 100)
 
-        if random_growth < 6 * self.model.light_strength:
+        if random_growth < 15 * self.model.light_strength:
             self.random_grow()
 
 
 class Fishtank(Model):
-    "class Fishtank creates a tank with agents"
+    "A fishtank is created with fish, algea and big fish"
     def __init__(self, width, height, probability_algea, number_fish, light_strength, number_big_fish):
         super().__init__()
 
@@ -369,7 +354,6 @@ class Fishtank(Model):
         return (self.algea_counter/ (self.width * self.height))
                 
 
-        
 def agent_portrayal(agent):
     "give proporties to the agents for visualization"
 
@@ -378,7 +362,7 @@ def agent_portrayal(agent):
     if agent.type == 'fish':
         portrayal["Layer"] = 2
 
-        if agent.energy == 0:
+        if agent.energy == 0 or agent.age == 40:
             portrayal["Shape"] = "doc/image/deadfish.png"
             portrayal["scale"] = 0.8
         
@@ -390,17 +374,15 @@ def agent_portrayal(agent):
 
             elif agent.age < 30:
                 portrayal["scale"] = 0.5
-                portrayal["Layer"] = 3
 
             else:
                 portrayal["scale"] = 0.8
-                portrayal["Layer"] = 4
 
     
     elif agent.type == 'bigfish': 
-        portrayal["Layer"] = 5 
+        portrayal["Layer"] = 3
 
-        if agent.big_energy == 0:
+        if agent.big_energy == 0 or agent.big_age > 100:
             portrayal["Shape"] = "doc/image/deadshark.png"
             portrayal["scale"] = 1    
         
@@ -412,11 +394,9 @@ def agent_portrayal(agent):
 
             elif agent.big_age < 30:      
                 portrayal["scale"] = 0.8
-                portrayal["Layer"] = 6
 
             else:
                 portrayal["scale"] = 1
-                portrayal["Layer"] = 7
 
 
     elif agent.type == 'algea':
@@ -429,44 +409,45 @@ def agent_portrayal(agent):
 
 if __name__ == "__main__":
     # visualisation of number of Fish depending on light strength
-    # fish = {}
-    # bigfish = {}
-    # for light in np.arange(0, 105, 5):
-    #     fish_list = []
-    #     bigfish_list = []
+    fish = {}
+    bigfish = {}
+    for light in np.arange(0, 105, 5):
+        fish_list = []
+        bigfish_list = []
 
-    #     tank = Fishtank(20, 20, 0.3, 30, light, 6)
+        tank = Fishtank(20, 20, 0.3, 30, light, 6)
 
-    #     for _ in range(600):
-    #         fish_list.append(tank.fish_counter)
-    #         mean_fish = sum(fish_list) / len(fish_list)
+        for _ in range(400):
+            fish_list.append(tank.fish_counter)
+            mean_fish = sum(fish_list) / len(fish_list)
 
-    #         bigfish_list.append(tank.big_fish_counter)
-    #         mean_bigfish = sum(bigfish_list) / len(bigfish_list)
+            bigfish_list.append(tank.big_fish_counter)
+            mean_bigfish = sum(bigfish_list) / len(bigfish_list)
             
-    #         tank.step()
+            tank.step()
         
-    #     fish[light] = mean_fish
-    #     bigfish[light] = mean_bigfish
+        fish[light] = mean_fish
+        bigfish[light] = mean_bigfish
     
-    # plt.plot(fish.keys(),fish.values())
-    # plt.plot(bigfish.keys(), bigfish.values())
-    # plt.legend(['fish', 'bigfish'])
-    # plt.title('Sensitivity of fish population depending on light strenght')
-    # plt.xlabel('Light strength')
-    # plt.ylabel('Fish numbers')
-    # plt.savefig('fishies.png')
+    plt.plot(fish.keys(),fish.values())
+    plt.plot(bigfish.keys(), bigfish.values())
+    plt.legend(['fish', 'bigfish'])
+    plt.title('Sensitivity of fish population depending on light strenght')
+    plt.xlabel('Light strength')
+    plt.ylabel('Fish numbers')
+    plt.savefig('fishies.png')
 
 
     # live visualisation of the fishtank with certain lightstrenght
     "ask light strenght input from user to decide how fast the algea grow"
-    light_strength = int(input('lightstrength in %: '))
+    # light_strength = int(input('lightstrength in %: '))
+    light_strength = 50
 
     "create a visualization of the animation and fish / algea countings"
     grid = CanvasGrid(agent_portrayal, 20, 20, 500, 300)
 
-    chart = ChartModule([{"Label": "fish", "Color": "Orange"}, 
-                        {"Label": "bigfish", "Color": "Red"}], 
+    chart = ChartModule([{"Label": "fish", "Color": "Red"}, 
+                        {"Label": "bigfish", "Color": "Blue"}], 
                         data_collector_name='datacollector')
     
     chart2 = ChartModule([{"Label": "algea", "Color": "Green"}], 
