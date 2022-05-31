@@ -1,4 +1,4 @@
-# project-ilona willemse fishtank
+# project - Ilona Willemse fishtank
 This code creates a situation that visualises a fishtank within an animation.
 
 ```
