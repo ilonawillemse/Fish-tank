@@ -34,7 +34,7 @@ $ python3 fish.py
     - [x] number gets reduced by fish that eat algea.
 
 - input
-    - [x] light strenght
+    - [x] light strength
 
 - output
     - [x] a live fish and algea counting is shown together with the fishtank animation to keep track of the populations inside the fishtank
@@ -42,8 +42,12 @@ $ python3 fish.py
 - end goal
     - [x] visualise how different fish populations are influenced by light strength
 
-- research question: what influence does the light strength have on the population of fish in a fishtank?
-    - .................. conclusion
+research question: what influence does the light strength have on the population of fish in a fishtank?
+
+![conclusion](fishies.png)
+
+    - conclusion: the more light the more algea growth the more the fish can eat. More eating means more energy so more fish are presented in the fishtank. For the second range of fish which only eat the smaller other species of fish, their populations grows too with more light. This is because there are more fish inside the tank which they can eat and therefore reproduce more.
+
 
 ## libraries
 ```
@@ -56,6 +60,8 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
 from mesa.datacollection import DataCollector
+import statistics
+
 ```
 
 ## limitations that could come up
@@ -71,5 +77,7 @@ https://docplayer.nl/161846295-Agent-based-modeling-domein-r-computational-scien
 credits to:
 mesa introdyctory tutorial
 mesa advanced tutorial
+
+with the help of Mesa I was able to implement some really cool properties of the fishtank
 
 ```

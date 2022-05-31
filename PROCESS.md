@@ -58,3 +58,8 @@ week 3:
 Monday:
 - made visualisation of fish populations when light strength gets influenced
 - removed excessive lines of code by implementing another method which returns just a value
+
+Tuesday:
+- fixed a bug in my visualisation
+- removed big fish function to look at nearby fish because this all of a sudden did not work anymore
+
