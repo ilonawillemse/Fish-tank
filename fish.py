@@ -19,15 +19,16 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
 from mesa.datacollection import DataCollector
+import statistics
 
 
 class BigFish(Agent):
     "Creating BigFish agents"
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.big_energy = 400
-        self.big_age = 0
         self.type = 'bigfish'
+        self.big_energy = 100
+        self.big_age = self.random.randrange(0,20)
         self.big_mating_counter = 0
 
 
@@ -39,20 +40,20 @@ class BigFish(Agent):
         
         "make the big fish move to nearby fish"
 
-        for i in range(len(possible_steps)):
-            the_agents = self.model.grid.get_cell_list_contents([possible_steps[i]])
-            if len(the_agents)> 0:
-                for option in range(len(the_agents)):
-                    if isinstance(the_agents[option], Fish):
-                        new_position = possible_steps[i]
-                        pass
-                    else:
-                        new_position = self.random.choice(possible_steps)
+        # for i in range(len(possible_steps)):
+        #     the_agents = self.model.grid.get_cell_list_contents([possible_steps[i]])
+        #     if len(the_agents)> 0:
+        #         for option in range(len(the_agents)):
+        #             if isinstance(the_agents[option], Fish):
+        #                 new_position = possible_steps[i]
+        #                 pass
+        #             else:
+        #                 new_position = self.random.choice(possible_steps)
 
-            else:
-                new_position = self.random.choice(possible_steps)
+        #     else:
+        new_position = self.random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
-        self.big_energy -= 10
+        self.big_energy -= 3
         self.big_look()
 
 
@@ -66,7 +67,7 @@ class BigFish(Agent):
             for option in range(len(agents)):
                 if isinstance(agents[option], Fish):
                     agent_fish = agents[option]
-                    if self.big_energy < 100:
+                    if self.big_energy < 200:
                         self.big_eat(agent_fish)
         
                 "make the big fish mate with each other at the same location"
@@ -79,13 +80,22 @@ class BigFish(Agent):
         
         self.big_mating_counter +=1
         self.big_age +=1
+    
+    
+    def step(self):
+        "the big fish moves when it still has enegery, otherwise dies"
+        if self.big_fish_energy() and self.big_age < 200:
+            self.big_move()
+
+        else:
+            self.big_move_up()
 
 
     def big_eat(self, fish): 
         "the big fish eats other smaller fish"
         self.model.grid.remove_agent(fish)
         self.model.schedule.remove(fish)
-        self.big_energy += 200
+        self.big_energy += 100
     
 
     def big_move_up(self):        
@@ -104,15 +114,6 @@ class BigFish(Agent):
         "the big fish dies / dissapears"
         self.model.grid.remove_agent(self)
         self.model.schedule.remove(self)
-          
-
-    def step(self):
-        "the big fish moves when it still has enegery, otherwise dies"
-        if self.big_fish_energy() and self.big_age < 100:
-            self.big_move()
-
-        else:
-            self.big_move_up()
 
 
     def big_fish_energy(self):
@@ -144,10 +145,10 @@ class Fish(Agent):
     "Creating Fish agents"
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
+        self.type = 'fish'
         self.energy = 40
         self.mating_counter = 0
-        self.age = 0
-        self.type = 'fish'
+        self.age = self.random.randrange(0,20)
     
 
     def move(self): 
@@ -170,7 +171,6 @@ class Fish(Agent):
             else:
                 new_position = self.random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
-        self.energy -= 2
         self.look()
 
 
@@ -193,16 +193,19 @@ class Fish(Agent):
         
         if self.current_fish_count > 1:
             if self.fish_mating_energy() and self.age > 10:
-                    self.mating()
+                self.mating()
         
         self.mating_counter +=1
-        self.age +=1
     
 
     def step(self):
         "the fish moves when it still has enegery, otherwise dies"
-        if self.fish_energy() and self.age < 50:
-            self.move()
+        if self.fish_energy() and self.age < 45:
+            speed = self.random.randrange(1,3)
+            for _ in range(speed):
+                self.move()
+            self.age +=1
+            self.energy -= 1
 
         else:
             self.move_up()
@@ -216,7 +219,7 @@ class Fish(Agent):
 
     def fish_mating_energy(self):
         "tells whether the fish has enough mating energy"
-        if self.energy > 30:
+        if self.energy > 40:
             return True
 
 
@@ -224,7 +227,7 @@ class Fish(Agent):
         "the fish eats algea"
         self.model.grid.remove_agent(algea)
         self.model.schedule.remove(algea)
-        self.energy += 30
+        self.energy += 10
     
 
     def move_up(self):        
@@ -250,6 +253,7 @@ class Fish(Agent):
         if self.mating_counter > 20:
             current = self.model.grid.get_cell_list_contents([self.pos])
             if len(current) < 3:
+                # print('okee')
                 fish = Fish(self.model.next_id(), self.model)
                 self.model.schedule.add(fish)
                 self.model.grid.place_agent(fish, self.pos)
@@ -278,8 +282,7 @@ class Algea(Agent):
     def step(self):
         "with chance the algea can grow in time"
         random_growth = self.random.randint(0, 100)
-
-        if random_growth < 10 * self.model.light_strength:
+        if random_growth < 25 * self.model.light_strength:
             self.random_grow()
 
 
@@ -289,10 +292,10 @@ class Fishtank(Model):
         super().__init__()
         self.width = width
         self.height = height
-        self.number_algea = width * height * probability_algea
-        self.number_fish = number_fish
-        self.number_big_fish = number_big_fish
         self.light_strength = light_strength / 50
+        self.fish_counter = 0
+        self.big_fish_counter = 0
+        self.algea_counter = 0
         
         self.grid = MultiGrid(width, height, False)
         self.visgrid = np.zeros((height,width))
@@ -305,29 +308,27 @@ class Fishtank(Model):
         
 
         "agents are being created and added to the grid and schedule"
-        for _ in range(self.number_fish):
+        # fish
+        for _ in range(number_fish):
             a = Fish(self.next_id(), self)
             self.schedule.add(a)
-
-            # fish
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
             self.grid.place_agent(a, (x, y))
         
-        for _ in range(int(self.number_algea)):
+        # algea
+        number_algea = width * height * probability_algea
+        for _ in range(int(number_algea)):
             b = Algea(self.next_id(), self)
             self.schedule.add(b)
-
-            # algea
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
             self.grid.place_agent(b, (x, y))
         
-        for _ in range(self.number_big_fish):
+        # big fish
+        for _ in range(number_big_fish):
             c = BigFish(self.next_id(), self)
             self.schedule.add(c)
-
-            # big fish
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
             self.grid.place_agent(c, (x, y))
@@ -340,6 +341,8 @@ class Fishtank(Model):
     
 
     def fishcounting(self):
+        "keeps track of the number of fish, big fish and algea in the tank"
+
         self.fish_counter = 0
         self.big_fish_counter = 0
         self.algea_counter = 0
@@ -357,14 +360,16 @@ class Fishtank(Model):
 
 
     def fish(self):
+        "returns the number of fish in the tank"
         return self.fish_counter
 
 
     def bigfish(self):
+        "returns the number of big fish in the tank"
         return self.big_fish_counter
 
-
     def algea(self):
+        "returns percentages of algea in comparison to the tank"
         return (self.algea_counter/ (self.width * self.height))
                 
 
@@ -423,33 +428,33 @@ def agent_portrayal(agent):
 
 if __name__ == "__main__":
     # visualisation of number of Fish depending on light strength
-    # fish = {}
-    # bigfish = {}
-    # for light in np.arange(0, 105, 5):
-    #     fish_list = []
-    #     bigfish_list = []
+    fish = {}
+    bigfish = {}
+    for light in np.arange(0, 110, 10):
+        fish_list = []
+        bigfish_list = []
 
-    #     tank = Fishtank(20, 20, 0.3, 30, light, 6)
+        for i in range(20):
+            print(i)
+            tank = Fishtank(15, 15, 0.3, 20, light, 6)
+            for _ in range(400):  
+                tank.step()            
+            fish_list.append(tank.fish_counter)
+            bigfish_list.append(tank.big_fish_counter)
 
-    #     for _ in range(400):
-    #         fish_list.append(tank.fish_counter)
-    #         mean_fish = sum(fish_list) / len(fish_list)
-
-    #         bigfish_list.append(tank.big_fish_counter)
-    #         mean_bigfish = sum(bigfish_list) / len(bigfish_list)
-            
-    #         tank.step()
+        mean_fish = statistics.mean(fish_list)
+        mean_bigfish = statistics.mean(bigfish_list)
         
-    #     fish[light] = mean_fish
-    #     bigfish[light] = mean_bigfish
+        fish[light] = mean_fish
+        bigfish[light] = mean_bigfish
     
-    # plt.plot(fish.keys(),fish.values())
-    # plt.plot(bigfish.keys(), bigfish.values())
-    # plt.legend(['fish', 'bigfish'])
-    # plt.title('Sensitivity of fish population depending on light strenght')
-    # plt.xlabel('Light strength')
-    # plt.ylabel('Fish numbers')
-    # plt.savefig('fishies.png')
+    plt.plot(fish.keys(),fish.values())
+    plt.plot(bigfish.keys(), bigfish.values())
+    plt.legend(['fish', 'bigfish'])
+    plt.title('Sensitivity of fish population depending on light strenght')
+    plt.xlabel('Light strength')
+    plt.ylabel('Fish numbers')
+    plt.savefig('fishies.png')
 
 
     # live visualisation of the fishtank with certain lightstrenght
@@ -458,7 +463,7 @@ if __name__ == "__main__":
     light_strength = 50
 
     "create a visualization of the animation and fish / algea countings"
-    grid = CanvasGrid(agent_portrayal, 20, 20, 500, 300)
+    grid = CanvasGrid(agent_portrayal, 15, 15, 500, 300)
 
     chart = ChartModule([{"Label": "fish", "Color": "Red"}, 
                         {"Label": "bigfish", "Color": "Blue"}], 
@@ -470,7 +475,7 @@ if __name__ == "__main__":
     server = ModularServer(Fishtank,
                         [grid,chart2,chart],
                         "Fishtank Ilona Willemse",
-                        {"width":20, "height": 20, "probability_algea": 0.3, "number_fish": 30, "light_strength": light_strength, "number_big_fish": 6})
+                        {"width":15, "height": 15, "probability_algea": 0.3, "number_fish": 20, "light_strength": light_strength, "number_big_fish": 6})
     server.port = 8521 # The default
 
     server.launch()
