@@ -3,21 +3,21 @@
 
 - I really like how I finally was able to insert images of fish / algea inside my animation
 
-- the floating part of my fish when they die i think is cool too.
+- The floating part of my fish when they die i think is cool too.
 
-- the balanced algea fish relationship
+- The balanced algea-fish relationship
 
 
 
 <!-- how i cleaned up some parts -->
 - I added some methods in order to return the counting of the fish and algea populations at once, this way i did not have to repeat my iterating over the grid for more than once.
 
-- also I limited the lines of code in the main by putting the visualisations inside some functions
+- Also I limited the lines of code in the main by putting the visualisations inside some functions
 
 
 
 <!-- biggest decisions -->
-some of the things i wanted to implement in my animation / agent model were: inserting an image of a fish to the grid for visualisation, live tracking of the fish countings and on top of that live viewing this underneath the fishtank visualisation and giving my fish the oppertunity to grow.
+Some of the things I wanted to implement in my animation / agent model were: inserting an image of a fish to the grid for visualisation, live tracking of the fish/algea countings, on top of that live viewing this underneath the fishtank visualisation and giving my fish the oppertunity to grow.
 
 
 - not being able to insert an image inside the animation instead of a square. I tried so much options to insert an image to the animation grid but nothing worked. When I decided to throw out my matplotlib aproach and changed it for the mesa visualisation this problem was fixed. I tried different approaches like some people tried on the internet but they did not work for me. For example, one approach only made my new 'picture' a close up from the real one instead of inserting it in a grid. By chosing for Mesa this implementation became more realistic.
