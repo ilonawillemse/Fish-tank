@@ -62,4 +62,5 @@ Monday:
 Tuesday:
 - fixed a bug in my visualisation
 - removed big fish function to look at nearby fish because this all of a sudden did not work anymore
+- failed to find the balance between the big fish and the rest of the fishtank
 

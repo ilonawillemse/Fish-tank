@@ -6,7 +6,7 @@ The fish move can swim, reproduce and eat algea. They stop eating the algea when
 ```
 
 ![Fishtank visualization](doc/image/tank_visualization.png)
-![Algea Fish countings](doc/image/balance.png)
+![Algea Fish countings](doc/image/balance_visualization.png)
 
 
 ## How to run
@@ -42,11 +42,12 @@ $ python3 fish.py
 - end goal
     - [x] visualise how different fish populations are influenced by light strength
 
-research question: what influence does the light strength have on the population of fish in a fishtank?
+## research question: what influence does the light strength have on the population of fish in a fishtank?
 
-![conclusion](fishies.png)
-
-    - conclusion: the more light the more algea growth the more the fish can eat. More eating means more energy so more fish are presented in the fishtank. For the second range of fish which only eat the smaller other species of fish, their populations grows too with more light. This is because there are more fish inside the tank which they can eat and therefore reproduce more.
+![conclusion](doc/image/fishies.png)
+```
+conclusion: The more light the more algea growth the more the fish can eat. More eating means more energy so more fish are presented in the fishtank. For the second range of fish which only eat the smaller other species of fish, their populations grows too with more light. This is because there are more fish inside the tank which they can eat and therefore reproduce more.
+```
 
 
 ## libraries

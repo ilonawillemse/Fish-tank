@@ -368,7 +368,7 @@ def agent_portrayal(agent):
     if agent.type == 'fish':
         portrayal["Layer"] = 2
 
-        if agent.energy == 0 or agent.age == 40:
+        if agent.energy == 0 or agent.age == 45:
             portrayal["Shape"] = "doc/image/deadfish.png"
             portrayal["scale"] = 0.8
         
@@ -388,7 +388,7 @@ def agent_portrayal(agent):
     elif agent.type == 'bigfish': 
         portrayal["Layer"] = 3
 
-        if agent.big_energy == 0 or agent.big_age > 100:
+        if agent.big_energy == 0 or agent.big_age == 200:
             portrayal["Shape"] = "doc/image/deadshark.png"
             portrayal["scale"] = 1    
         
@@ -471,6 +471,6 @@ if __name__ == "__main__":
 
     "live visualisation of the fishtank with certain light strength"
     "ask light strenght input from user to decide how fast the algea grow"
-    # light_strength = int(input('lightstrength in %: '))
+    light_strength = int(input('lightstrength in %: '))
 
-    # live_fishtank(light_strength)
+    live_fishtank(light_strength)

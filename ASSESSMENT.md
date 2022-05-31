@@ -5,9 +5,15 @@
 
 - the floating part of my fish when they die i think is cool too.
 
+- the balanced algea fish relationship
+
+
 
 <!-- how i cleaned up some parts -->
 - I added some methods in order to return the counting of the fish and algea populations at once, this way i did not have to repeat my iterating over the grid for more than once.
+
+- also I limited the lines of code in the main by putting the visualisations inside some functions
+
 
 
 <!-- biggest decisions -->
