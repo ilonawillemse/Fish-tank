@@ -38,19 +38,6 @@ class BigFish(Agent):
             self.pos, moore=True, include_center=True
         )
         
-        "make the big fish move to nearby fish"
-
-        # for i in range(len(possible_steps)):
-        #     the_agents = self.model.grid.get_cell_list_contents([possible_steps[i]])
-        #     if len(the_agents)> 0:
-        #         for option in range(len(the_agents)):
-        #             if isinstance(the_agents[option], Fish):
-        #                 new_position = possible_steps[i]
-        #                 pass
-        #             else:
-        #                 new_position = self.random.choice(possible_steps)
-
-        #     else:
         new_position = self.random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
         self.big_energy -= 3
@@ -424,18 +411,17 @@ def agent_portrayal(agent):
         portrayal["Layer"] = 1
 
     return portrayal
-        
 
-if __name__ == "__main__":
-    # visualisation of number of Fish depending on light strength
+def visualize_experiment():
+    "visualisation of number of Fish depending on light strength"
     fish = {}
     bigfish = {}
     for light in np.arange(0, 110, 10):
+        print(light)
         fish_list = []
         bigfish_list = []
 
-        for i in range(20):
-            print(i)
+        for _ in range(20):
             tank = Fishtank(15, 15, 0.3, 20, light, 6)
             for _ in range(400):  
                 tank.step()            
@@ -447,22 +433,20 @@ if __name__ == "__main__":
         
         fish[light] = mean_fish
         bigfish[light] = mean_bigfish
+
+    print(fish)
+    print(bigfish)
     
     plt.plot(fish.keys(),fish.values())
     plt.plot(bigfish.keys(), bigfish.values())
     plt.legend(['fish', 'bigfish'])
-    plt.title('Sensitivity of fish population depending on light strenght')
+    plt.title('Sensitivity of fish populations depending on light strength')
     plt.xlabel('Light strength')
     plt.ylabel('Fish numbers')
     plt.savefig('fishies.png')
 
-
-    # live visualisation of the fishtank with certain lightstrenght
-    "ask light strenght input from user to decide how fast the algea grow"
-    # light_strength = int(input('lightstrength in %: '))
-    light_strength = 50
-
-    "create a visualization of the animation and fish / algea countings"
+def live_fishtank(light_strength):
+    "create an animation and view fish / algea countings"
     grid = CanvasGrid(agent_portrayal, 15, 15, 500, 300)
 
     chart = ChartModule([{"Label": "fish", "Color": "Red"}, 
@@ -479,3 +463,14 @@ if __name__ == "__main__":
     server.port = 8521 # The default
 
     server.launch()
+
+
+if __name__ == "__main__":
+    "sensitivity analysis of number of fish depending on ligth strength"
+    # visualize_experiment()
+
+    "live visualisation of the fishtank with certain light strength"
+    "ask light strenght input from user to decide how fast the algea grow"
+    # light_strength = int(input('lightstrength in %: '))
+
+    # live_fishtank(light_strength)
