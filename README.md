@@ -6,7 +6,7 @@ The fish move can swim, reproduce and eat algea. They stop eating the algea when
 ```
 
 ![Fishtank visualization](doc/image/tank_visualization.png)
-![Algea Fish countings](doc/image/balance_visualization.png)
+![Algea Fish countings](doc/image/balans_visualization.png)
 
 
 ## How to run
