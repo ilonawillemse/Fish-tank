@@ -42,7 +42,8 @@ $ python3 fish.py
 - end goal
     - [x] visualise how different fish populations are influenced by light strength
 
-## research question: what influence does the light strength have on the population of fish in a fishtank?
+## research question
+what influence does the light strength have on the population of fish in a fishtank?
 
 ![conclusion](doc/image/fishies.png)
 ```
