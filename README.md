@@ -45,16 +45,15 @@ $ python3 fish.py
 ## research question
 what influence does the light strength have on the population of fish in a fishtank?
 
-![conclusion](doc/image/fishies.png)
+[![conclusion](doc/image/fishies.png)](https://www.youtube.com/embed/BvsXX_RTYqo)
+
+```
+tap on the picture to see the screencast
+```
+
 ```
 conclusion: The more light the more algea growth the more the fish can eat. More eating means more energy so more fish are presented in the fishtank. For the second range of fish which only eat the smaller other species of fish, their populations grows too with more light. This is because there are more fish inside the tank which they can eat and therefore reproduce more.
 ```
-<p align = "center">
-<iframe width="560" height="315" src="https://www.youtube.com/embed/BvsXX_RTYqo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</p>
-
-[![screencast](doc/image/tank_visualization.png)](https://www.youtube.com/embed/BvsXX_RTYqo)
-tap on the picture to see the screencast
 
 
 ## libraries
